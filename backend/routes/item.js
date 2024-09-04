@@ -3,7 +3,6 @@ const multer = require('multer');
 const Item = require('../models/Item');
 const router = express.Router();
 
-// Multer setup for image upload
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, 'uploads/');
@@ -15,7 +14,6 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-// Route to create a new item with image upload
 router.post('/items', upload.single('image'), async (req, res) => {
   const { name, price, contact, userId } = req.body;
   const image = req.file.path;
@@ -29,7 +27,6 @@ router.post('/items', upload.single('image'), async (req, res) => {
   }
 });
 
-// Route to get all items
 router.get('/items', async (req, res) => {
   try {
     const items = await Item.find();

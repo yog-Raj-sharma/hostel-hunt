@@ -5,7 +5,7 @@ import 'bootstrap/dist/js/bootstrap.bundle.min';
 import Hostel from './Hostel';
 import Outlets from './Outlets';
 import Sell from './Sell&Purchase';
-import YourProfile from './YourProfile'; // Import the YourProfile component
+import YourProfile from './YourProfile'; 
 
 export default function NavBar() {
   const [darkMode, setDarkMode] = useState(true);
@@ -31,9 +31,8 @@ export default function NavBar() {
   };
 
   const handleSignOut = () => {
-    // Implement sign-out logic here, e.g., clearing authentication tokens
-    // Redirect to LoginPage
-    navigate('/login'); // Assuming you have set up a route for LoginPage
+    localStorage.removeItem('authToken');
+    navigate('/LoginPage'); 
   };
 
   const handleContactUs = () => {
@@ -119,7 +118,7 @@ export default function NavBar() {
         {activeComponent === 'hostels' && <Hostel />}
         {activeComponent === 'outlets' && <Outlets />}
         {activeComponent === 'sell' && <Sell />}
-        {activeComponent === 'profile' && <YourProfile />} {/* New Profile Component */}
+        {activeComponent === 'profile' && <YourProfile />} 
       </div>
     </>
   );

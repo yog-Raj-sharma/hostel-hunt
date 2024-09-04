@@ -45,7 +45,7 @@ export default function Sell() {
     formData.append('image', newItem.image);
 
     const token = localStorage.getItem('authToken');
-    const userId = parseToken(token).userId; // Assuming your token contains userId
+    const userId = parseToken(token).userId; 
     formData.append('userId', userId);
 
     try {
@@ -141,9 +141,9 @@ export default function Sell() {
               />
             </div>
             <input
-              type="number"
+              type="text"
               className="form-control form-control-sm me-2"
-              placeholder="Contact Number"
+              placeholder="Contact Info"
               name="contact"
               value={newItem.contact}
               onChange={handleInputChange}
@@ -163,15 +163,12 @@ export default function Sell() {
     style={{ marginTop: '1rem', padding: '1rem' }}
   >
     <div className="container-fluid d-flex justify-content-between align-items-center">
-      {/* Name */}
       <span
         className="text-white"
         style={{ flexBasis: '25%', textAlign: 'left', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
       >
         {item.name}
       </span>
-
-      {/* Image */}
       <div
         style={{ flexBasis: '10%', display: 'flex', justifyContent: 'center' }}
       >
@@ -182,16 +179,12 @@ export default function Sell() {
           onClick={() => handleImageClick(`http://localhost:3001/${item.image}`)}
         />
       </div>
-
-      {/* Price */}
       <span
         className="text-white"
         style={{ flexBasis: '15%', textAlign: 'center', whiteSpace: 'nowrap' }}
       >
         INR {item.price}
       </span>
-
-      {/* Contact */}
       <span
         className="text-white"
         style={{ flexBasis: '25%', textAlign: 'right', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
@@ -201,9 +194,6 @@ export default function Sell() {
     </div>
   </nav>
 ))}
-
-
-      {/* Modal for Image Zoom */}
       {showImage && (
         <div className="modal show" style={{ display: 'block', position: 'absolute', top: '10%', left: '10%', width: '80%', height: '80%' }}>
           <div className="modal-dialog modal-dialog-centered modal-lg">

@@ -153,7 +153,6 @@ export default function SignUpPage() {
                     {error && <div className="text-danger mt-3">{error}</div>}
                 </form>
             </div>
-            {/* Moving Text Below the Form */}
             
                 <div
                     className="w-100 text-center text-danger mt-4"

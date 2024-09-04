@@ -9,6 +9,7 @@ export default function Hostel() {
   const [selectedRatings, setSelectedRatings] = useState({});
   const [averageRatings, setAverageRatings] = useState({});
   const [roomDetails, setRoomDetails] = useState({});
+
   const [commentText, setCommentText] = useState('');
   const [selectedImages, setSelectedImages] = useState([]);
   const [searchedRooms, setSearchedRooms] = useState({});
@@ -145,14 +146,32 @@ export default function Hostel() {
   };
 
   const handleSearch = async (hostel) => {
+  const roomNumber = searchedRooms[hostel]?.trim();
+
+  if (!roomNumber) {
+    setRoomDetails((prevDetails) => ({
+      ...prevDetails,
+      [hostel]: null,
+    }));
+    return;
+  }
+
   try {
     const response = await fetch('http://localhost:3001/api/rooms', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ hostel, roomNumber: searchedRooms[hostel] }),
+      body: JSON.stringify({ hostel, roomNumber }),
     });
 
+    if (!response.ok) {
+      console.error('Failed to search room:', response.statusText);
+      return;
+    }
+
     const roomData = await response.json();
+    if (roomData.comments && Array.isArray(roomData.comments)) {
+      roomData.comments.reverse();
+    }
     setRoomDetails((prevDetails) => ({
       ...prevDetails,
       [hostel]: roomData,
@@ -162,55 +181,81 @@ export default function Hostel() {
   }
 };
 
-const renderExtraContent = (hostel) => (
-  <div
-    style={{
-      backgroundColor: 'rgba(52, 58, 64, 0.8)',
-      padding: '10px',
-      borderTop: 'none',
-      borderBottom: '2px solid white',
-    }}
-  >
-    <div className="d-flex justify-content-between align-items-center">
-      <div className="d-flex align-items-center">
-        {[...Array(5)].map((_, index) => (
-          <span
-            key={index}
-            className="text-warning"
-            style={{ cursor: 'pointer' }}
-            onClick={() => handleStarClick(hostel, index + 1)}
+const renderExtraContent = (hostel) => {
+  const roomNumber = searchedRooms[hostel]?.trim();
+
+  return (
+    <div
+      style={{
+        backgroundColor: 'rgba(52, 58, 64, 0.8)',
+        padding: '10px',
+        borderTop: 'none',
+        borderBottom: '2px solid white',
+      }}
+    >
+      <div className="d-flex justify-content-between align-items-center">
+        <div className="d-flex align-items-center">
+          {[...Array(5)].map((_, index) => (
+            <span
+              key={index}
+              className="text-warning"
+              style={{ cursor: 'pointer' }}
+              onClick={() => handleStarClick(hostel, index + 1)}
+            >
+              {index < (selectedRatings[hostel] || userRatings[hostel] || 0) ? '\u2605' : '\u2606'}
+            </span>
+          ))}
+          <button className="btn btn-secondary ms-2" onClick={() => handleRateSubmit(hostel)}>Rate</button>
+        </div>
+        <div className="d-flex align-items-center">
+          <input
+            className="form-control me-2"
+            type="search"
+            placeholder="Search room"
+            aria-label="Search"
+            style={{ width: '200px' }}
+            value={searchedRooms[hostel] || ''}
+            onChange={(e) => {
+              const newRoomNumber = e.target.value;
+              setSearchedRooms({ ...searchedRooms, [hostel]: newRoomNumber });
+
+              
+              if (!newRoomNumber.trim()) {
+                setRoomDetails((prevDetails) => ({
+                  ...prevDetails,
+                  [hostel]: null,
+                }));
+              }
+            }}
+          />
+          <button
+            className="btn btn-outline-success"
+            onClick={() => handleSearch(hostel)}
+            disabled={!searchedRooms[hostel]?.trim()} 
           >
-            {index < (selectedRatings[hostel] || userRatings[hostel] || 0) ? '\u2605' : '\u2606'}
-          </span>
-        ))}
-        <button className="btn btn-secondary ms-2" onClick={() => handleRateSubmit(hostel)}>Rate</button>
+            Search
+          </button>
+        </div>
       </div>
-      <div className="d-flex align-items-center">
-        <input
-         className="form-control me-2"
-         type="search"
-         placeholder="Search room"
-         aria-label="Search"
-         style={{ width: '200px' }}
-         value={searchedRooms[hostel] || ''}
-         onChange={(e) => setSearchedRooms({ ...searchedRooms, [hostel]: e.target.value })}
-        />
-        <button className="btn btn-outline-success" onClick={() => handleSearch(hostel)}>Search</button>
+      <div>
+        {roomDetails[hostel] && roomDetails[hostel] !== null && (
+          <RoomDetails
+            roomDetails={roomDetails[hostel]}
+            commentText={commentText}
+            setCommentText={setCommentText}
+            selectedImages={selectedImages}
+            setSelectedImages={setSelectedImages}
+            handleSearch={handleSearch}
+            hostel={hostel}
+          />
+        )}
       </div>
     </div>
-    <div>
-      {roomDetails[hostel] && (
-        <RoomDetails
-          roomDetails={roomDetails[hostel]}
-          commentText={commentText}
-          setCommentText={setCommentText}
-          selectedImages={selectedImages}
-          setSelectedImages={setSelectedImages}
-        />
-      )}
-    </div>
-  </div>
-);
+  );
+};
+
+
+
 
   const renderRatingStars = (averageRating) => {
     const fullStars = Math.floor(averageRating);
@@ -220,13 +265,12 @@ const renderExtraContent = (hostel) => (
       <>
   {[...Array(fullStars)].map((_, index) => (
     <span key={index} className="text-warning">
-      {'\u2605'} {/* Filled star */}
+      {'\u2605'} 
     </span>
   ))}
 
   {halfStar && (
     <span style={{ position: 'relative', display: 'inline-block', width: '1em' }}>
-      {/* Full star (half visible) */}
       <span
         style={{
           position: 'absolute',
@@ -239,7 +283,6 @@ const renderExtraContent = (hostel) => (
       >
         {'\u2605'}
       </span>
-      {/* Empty star (background) */}
       <span className="text-warning">
         {'\u2606'}
       </span>
@@ -248,7 +291,7 @@ const renderExtraContent = (hostel) => (
 
   {[...Array(5 - fullStars - (halfStar ? 1 : 0))].map((_, index) => (
     <span key={index} className="text-warning">
-      {'\u2606'} {/* Empty star */}
+      {'\u2606'}
     </span>
   ))}
 </>

@@ -60,9 +60,9 @@ export default function Hostel() {
         const response = await fetch(`http://localhost:3001/api/hostel/${encodeURIComponent(hostel)}/average-rating`);
 
         if (!response.ok) {
-          const text = await response.text(); // Get response as text to debug
+          const text = await response.text();
           console.error(`Failed to fetch average rating for ${hostel}: ${text}`);
-          continue; // Skip this hostel and proceed to the next one
+          continue; 
         }
 
         const data = await response.json();
@@ -102,12 +102,12 @@ export default function Hostel() {
 
     try {
       const decodedToken = jwtDecode(token);
-      const expiry = decodedToken.exp * 1000; // Convert to milliseconds
+      const expiry = decodedToken.exp * 1000; 
       const now = Date.now();
 
       if (now > expiry) {
         console.error('Token has expired');
-        localStorage.removeItem('authToken'); // Remove expired token
+        localStorage.removeItem('authToken'); 
         return null;
       }
 
@@ -137,12 +137,12 @@ export default function Hostel() {
       });
 
       if (!response.ok) {
-        const text = await response.text(); // Get response as text to debug
+        const text = await response.text(); 
         console.error('Failed to submit rating:', text);
         return;
       }
 
-      await fetchAverageRatings(); // Refresh average ratings after submission
+      await fetchAverageRatings(); 
     } catch (error) {
       console.error('Failed to submit rating:', error);
     }
@@ -151,10 +151,10 @@ export default function Hostel() {
 const renderExtraContent = (hostel) => (
     <div
       style={{
-        backgroundColor: 'rgba(52, 58, 64, 0.8)', // Faded background color
+        backgroundColor: 'rgba(52, 58, 64, 0.8)', 
         padding: '10px',
-        borderTop: 'none', // No upper border
-        borderBottom: '2px solid white', // Thicker lower border
+        borderTop: 'none', 
+        borderBottom: '2px solid white', 
       }}
     >
       <div className="d-flex justify-content-between align-items-center">
@@ -176,15 +176,14 @@ const renderExtraContent = (hostel) => (
         <div className="d-flex align-items-center">
           <button 
             className="btn btn-success d-flex align-items-center" 
-            style={{ padding: '5px 10px' }} // Adjust padding to fit text and arrow
-            onClick={() => toggleFoodItems(hostel)} // Toggle the food items dropdown
+            style={{ padding: '5px 10px' }} 
+            onClick={() => toggleFoodItems(hostel)} 
           >
             Food Items
           </button>
         </div>
       </div>
 
-      {/* Render the FoodItems component conditionally */}
       {showFoodItems[hostel] && <FoodItems outlet={hostel} />}
     </div>
   );
@@ -197,13 +196,13 @@ const renderExtraContent = (hostel) => (
 <>
   {[...Array(fullStars)].map((_, index) => (
     <span key={index} className="text-warning">
-      {'\u2605'} {/* Filled star */}
+      {'\u2605'} 
     </span>
   ))}
 
   {halfStar && (
    <span style={{ position: 'relative', display: 'inline-block', width: '1em' }}>
-      {/* Full star (half visible) */}
+
       <span
         style={{
           position: 'absolute',
@@ -216,7 +215,7 @@ const renderExtraContent = (hostel) => (
       >
         {'\u2605'}
       </span>
-      {/* Empty star (background) */}
+
       <span className="text-warning">
         {'\u2606'}
       </span>
@@ -225,7 +224,7 @@ const renderExtraContent = (hostel) => (
 
   {[...Array(5 - fullStars - (halfStar ? 1 : 0))].map((_, index) => (
     <span key={index} className="text-warning">
-      {'\u2606'} {/* Empty star */}
+      {'\u2606'}
     </span>
   ))}
 </>
@@ -242,13 +241,13 @@ const renderExtraContent = (hostel) => (
     'G-block Cafeteria', "Jaggi's Coffee Shop", "Jaggi's Juice Shop", 'Hostel H Canteen'
       ].map((hostel, index) => (
         <div key={index}>
-          {/* Navbar */}
+          
           <nav
             className="navbar navbar-expand-lg bg-body-tertiary"
             data-bs-theme="dark"
             style={{
-              border: expandedIndex === index ? 'none' : '1px solid white', // Remove border when expanded
-              borderBottom: expandedIndex === index ? 'none' : '1px solid white' // Hide lower border when expanded
+              border: expandedIndex === index ? 'none' : '1px solid white', 
+              borderBottom: expandedIndex === index ? 'none' : '1px solid white' 
             }}
           >
             <div className="container-fluid">
@@ -259,23 +258,18 @@ const renderExtraContent = (hostel) => (
                   </li>
                 </ul>
 
-                {/* Average Rating Stars */}
                 <div className="d-flex align-items-center ms-auto">
                   {renderRatingStars(averageRatings[hostel] || 0)}
                 </div>
-
-                {/* Expand Button */}
                 <button
                   className="btn btn-secondary ms-2"
                   onClick={() => handleExpandClick(index)}
                 >
-                   {expandedIndex === index ? '\u25B2' : '\u25BC'} {/* Up or Down arrow */}
+                   {expandedIndex === index ? '\u25B2' : '\u25BC'} 
                 </button>
               </div>
             </div>
           </nav>
-
-          {/* Extra Content */}
           {expandedIndex === index && renderExtraContent(hostel)}
         </div>
       ))}

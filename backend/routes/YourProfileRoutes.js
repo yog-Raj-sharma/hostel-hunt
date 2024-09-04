@@ -3,7 +3,6 @@ const User = require('../models/User');
 const Item = require('../models/Item');
 const router = express.Router();
 
-// Route to get user's name and year based on userId
 router.get('/profile/:userId', async (req, res) => {
   try {
     const user = await User.findById(req.params.userId);
@@ -20,7 +19,6 @@ router.get('/profile/:userId', async (req, res) => {
   }
 });
 
-// Route to get items listed by the user based on userId
 router.get('/user-items/:userId', async (req, res) => {
   try {
     const items = await Item.find({ userId: req.params.userId });
@@ -31,7 +29,6 @@ router.get('/user-items/:userId', async (req, res) => {
   }
 });
 
-// Route to delete an item (mark as sold) based on userId
 router.delete('/items/:id', async (req, res) => {
   const { id } = req.params;
   const { userId } = req.body;

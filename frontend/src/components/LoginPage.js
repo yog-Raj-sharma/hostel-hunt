@@ -12,15 +12,11 @@ export default function LoginPage() {
         e.preventDefault();
         try {
             const response = await axios.post('http://localhost:3001/api/auth/signin', { email, password });
-
-            // Assuming the response contains the JWT token
             const { token } = response.data;
 
             if (token) {
-                // Store the token in localStorage
                 localStorage.setItem('authToken', token);
-                alert('Sign in successful');
-                navigate('/navbar'); // Navigate to the next page after successful sign-in
+                navigate('/navbar'); 
             } else {
                 alert('No token received');
             }

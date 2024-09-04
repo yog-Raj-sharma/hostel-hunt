@@ -4,7 +4,7 @@ export default function FoodItems({ outlet }) {
   const [foodItems, setFoodItems] = useState([]);
   const [newFoodName, setNewFoodName] = useState('');
   const [showAddBox, setShowAddBox] = useState(false);
-  const [error, setError] = useState(null); // Error handling
+  const [error, setError] = useState(null); 
 
   useEffect(() => {
     fetchFoodItems();
@@ -17,7 +17,7 @@ export default function FoodItems({ outlet }) {
       if (!response.ok) {
         const text = await response.text();
         console.error(`Failed to fetch food items for ${outlet}: ${text}`);
-        setFoodItems([]); // No food items
+        setFoodItems([]); 
         return;
       }
 
@@ -50,8 +50,8 @@ export default function FoodItems({ outlet }) {
 
       setNewFoodName('');
       setShowAddBox(false);
-      setError(null); // Clear any existing errors
-      fetchFoodItems(); // Refresh food items after adding a new one
+      setError(null); 
+      fetchFoodItems(); 
     } catch (error) {
       console.error('Failed to add food item:', error);
       setError('An error occurred while adding the food item');
@@ -66,14 +66,14 @@ export default function FoodItems({ outlet }) {
           display: 'block',
           position: 'absolute',
           top: '100%',
-          left: '83.5%', // Adjust as needed
+          left: '83.5%',
           zIndex: '1000',
           backgroundColor: '#fff',
           border: '1px solid rgba(0, 0, 0, 0.15)',
           boxShadow: '0 0.5rem 1rem rgba(0, 0, 0, 0.175)',
-          maxHeight: '320px', // Set a fixed height for the dropdown
-          overflowY: 'auto',  // Enable scrolling
-          width: '200px', // Adjust width as needed
+          maxHeight: '320px', 
+          overflowY: 'auto',  
+          width: '200px', 
         }}
       >
         {foodItems.length > 0 ? (

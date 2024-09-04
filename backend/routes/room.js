@@ -1,4 +1,3 @@
-// backend/routes/room.js
 const express = require('express');
 const router = express.Router();
 const Room = require('../models/room');
@@ -6,11 +5,10 @@ const multer = require('multer');
 const path = require('path');
 const User = require('../models/User');
 const upload = multer({
-  dest: 'uploads/', // Set your upload directory
-  limits: { fileSize: 5 * 1024 * 1024 } // 5 MB
+  dest: 'uploads/', 
+  limits: { fileSize: 5 * 1024 * 1024 } 
 });
 
-// Create or find room
 router.post('/', async (req, res) => {
   try {
     const { hostel, roomNumber } = req.body;
@@ -28,27 +26,20 @@ router.post('/', async (req, res) => {
   }
 });
 
-// Get room details (with hostel)
-// backend/routes/room.js
-// Get room details (with hostel)
 router.get('/api/rooms/:hostel/:roomNumber', async (req, res) => {
   try {
     const { hostel, roomNumber } = req.params;
 
-    // Log request parameters
     console.log(`Fetching room for hostel: ${hostel}, roomNumber: ${roomNumber}`);
 
-    // Find the room
     const room = await Room.findOne({ hostel, roomNumber });
 
     if (!room) {
       return res.status(404).json({ message: 'Room not found' });
     }
 
-    // Log room details
     console.log('Room found:', room);
 
-    // Manually fetch user details for each comment
     const commentsWithUserDetails = await Promise.all(room.comments.map(async (comment) => {
       try {
         const user = await User.findById(comment.userId);
@@ -75,7 +66,6 @@ router.get('/api/rooms/:hostel/:roomNumber', async (req, res) => {
   }
 });
 
-// Post comment
 router.post('/:hostel/:roomNumber/comments', upload.array('images'), async (req, res) => {
   try {
     const { hostel, roomNumber } = req.params;
@@ -93,20 +83,24 @@ router.post('/:hostel/:roomNumber/comments', upload.array('images'), async (req,
           }
         }
       },
-      { new: true }
+      { new: true, upsert: false }  // Return the updated document
     );
 
     if (!room) {
       return res.status(404).json({ error: 'Room not found' });
     }
 
-    res.status(200).json(room);
+    // Get the last comment (the one just added)
+    const newComment = room.comments[room.comments.length - 1];
+
+    // Return the new comment
+    res.status(200).json(newComment);
   } catch (error) {
     res.status(500).json({ error: 'Failed to post comment' });
   }
 });
 
-// Search for a specific room in a hostel
+
 router.post('/search', async (req, res) => {
   try {
     const { hostel, roomNumber } = req.body;

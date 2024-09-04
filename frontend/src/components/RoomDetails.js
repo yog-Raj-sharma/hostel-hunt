@@ -1,18 +1,56 @@
-// RoomDetails.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { jwtDecode } from 'jwt-decode';
 
-function RoomDetails({ roomDetails, setRoomDetails, roomNumber }) {
+function RoomDetails({ roomDetails = { comments: [] }, setRoomDetails, roomNumber, handleSearch, onCommentSubmit }) {
   const [isVisible, setIsVisible] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [currentImage, setCurrentImage] = useState('');
   const [commentText, setCommentText] = useState('');
   const [selectedImages, setSelectedImages] = useState([]);
+  const [userNames, setUserNames] = useState({});
 
   const handleClose = () => {
     setIsVisible(false);
   };
+
+  const fetchUserName = async (userId) => {
+    if (userNames[userId]) {
+      return userNames[userId]; // Return cached name if already fetched
+    }
+
+    try {
+      const response = await fetch(`http://localhost:3001/api/profile/${userId}`);
+      if (!response.ok) {
+        console.error('Failed to fetch user name:', response.statusText);
+        return 'Unknown User';
+      }
+
+      const data = await response.json();
+      const userName = data.name;
+
+      setUserNames((prevNames) => ({
+        ...prevNames,
+        [userId]: userName, // Cache the fetched name
+      }));
+
+      return userName;
+    } catch (error) {
+      console.error('Error fetching user name:', error);
+      return 'Unknown User';
+    }
+  };
+
+  useEffect(() => {
+    const fetchAllUserNames = async () => {
+      const uniqueUserIds = [...new Set(roomDetails.comments.map((comment) => comment.userId))];
+      for (const userId of uniqueUserIds) {
+        await fetchUserName(userId);
+      }
+    };
+
+    fetchAllUserNames();
+  }, [roomDetails.comments]);
 
   const getUserIdFromToken = () => {
     const token = localStorage.getItem('authToken');
@@ -39,10 +77,13 @@ function RoomDetails({ roomDetails, setRoomDetails, roomNumber }) {
     }
   };
 
-  const handleCommentSubmit = async (hostel) => {
+  const handleFileChange = (e) => {
+    setSelectedImages((prevImages) => [...prevImages, ...Array.from(e.target.files)]);
+  };
+
+  const handleCommentSubmit = async () => {
     try {
       const userId = getUserIdFromToken();
-
       if (!userId) return;
 
       const formData = new FormData();
@@ -62,16 +103,10 @@ function RoomDetails({ roomDetails, setRoomDetails, roomNumber }) {
         console.error('Failed to post comment:', text);
         return;
       }
-
-      const updatedRoom = await response.json();
-
-      setRoomDetails((prevDetails) => ({
-        ...prevDetails,
-        [roomNumber]: updatedRoom,
-      }));
-
       setCommentText('');
       setSelectedImages([]);
+
+      handleSearch(roomDetails.hostel); 
     } catch (error) {
       console.error('Failed to post comment:', error);
     }
@@ -97,37 +132,33 @@ function RoomDetails({ roomDetails, setRoomDetails, roomNumber }) {
           overflowY: 'auto' 
         }}
       >
-        {/* Close button */}
+
         <button 
           onClick={handleClose} 
           style={{ 
             position: 'absolute', 
             top: '10px', 
             right: '10px', 
-            backgroundColor: '#FF6F61',  // Stylish coral color
+            backgroundColor: '#FF6F61',  
             border: 'none', 
-            borderRadius: '50%',  // Circular button
-            width: '40px',  // Same size
-            height: '40px',  // Same size
-            fontSize: '16px',  // Slightly smaller font
-            color: '#FFF',  // White text
+            borderRadius: '50%',  
+            width: '40px',  
+            height: '40px',  
+            fontSize: '16px',  
+            color: '#FFF',  
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: '0 4px 8px rgba(0,0,0,0.2)',  // Shadow for depth
+            boxShadow: '0 4px 8px rgba(0,0,0,0.2)',  
             cursor: 'pointer',
-            transition: 'background-color 0.3s, transform 0.2s',  // Smooth transitions
+            transition: 'background-color 0.3s, transform 0.2s',  
           }} 
-          onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#FF4C4C'} // Hover effect
-          onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#FF6F61'}  // Revert on mouse out
+          onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#FF4C4C'} 
+          onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#FF6F61'}  
         >
           &times;
         </button>
-
-        {/* Room number and hostel name */}
         <h5 style={{ color: 'black' }}>{`${roomDetails.hostel} - Room ${roomDetails.roomNumber}`}</h5>
-
-        {/* Comment input and file upload section */}
         <div className="mb-3">
           <textarea
             className="form-control"
@@ -135,50 +166,54 @@ function RoomDetails({ roomDetails, setRoomDetails, roomNumber }) {
             value={commentText}
             onChange={(e) => setCommentText(e.target.value)}
           ></textarea>
-          <input
-            type="file"
-            className="form-control mt-2"
-            multiple
-            onChange={(e) => setSelectedImages([...e.target.files])}
-          />
+          
+          <div>
+            <input
+              type="file"
+              className="form-control mt-2"
+              multiple
+              onChange={handleFileChange}
+            />
+
+            <div className="mt-2">
+              {selectedImages.length > 0 && (
+                <ul>
+                  {selectedImages.map((file, index) => (
+                    <li key={index} style={{ color: 'black' }}>{file.name}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
+
           <button className="btn btn-primary mt-2" onClick={handleCommentSubmit}>Post</button>
         </div>
+        <div>
+          <div className="card p-3 mb-3 shadow-sm bg-light text-dark">
+             {roomDetails.comments?.map((comment, index) => (
+  <div key={index} className="mb-4 p-3 bg-light border border-secondary rounded">
+    <p style={{ color: 'black' }}>
+      <strong>{userNames[comment.userId] || 'Loading...'}</strong> 
+       <span style={{ marginLeft: '10px', color: 'gray', fontSize: '12px' }}>
+      Posted on:  {new Date(comment.timestamp).toLocaleDateString()} {/* Display the date */}
+      </span>
 
-        {/* Display existing comments */}
-         <div className="card p-3 mb-3 shadow-sm bg-light text-dark">
-  {roomDetails.comments.map((comment, index) => (
-    <div key={index} className="mb-4 p-3 bg-light border border-secondary rounded">
-      {/* Username */}
-      <strong style={{ color: 'black' }}>
-        {comment.userName}
-      </strong>
+    </p>
+    <p style={{ color: 'black' }}>{comment.text}</p>
+    {comment.images.map((image, idx) => (
+      <img
+        key={idx}
+        src={`http://localhost:3001/${image}`}
+        alt={`Uploaded by ${userNames[comment.userId] || 'User'}`}
+        style={{ width: '100px', marginRight: '10px', cursor: 'pointer' }}
+        onClick={() => handleImageClick(`http://localhost:3001/${image}`)}
+      />
+    ))}
+  </div>
+))}
 
-      {/* Gender */}
-      <p style={{ color: 'gray' }}>
-        {comment.userGender}
-      </p>
-
-      {/* Comment text */}
-      <p style={{ color: 'black' }}>{comment.text}</p>
-
-      {/* Images */}
-      {comment.images.map((image, idx) => (
-        <img
-          key={idx}
-          src={`http://localhost:3001/${image}`}
-          alt={`Uploaded by ${comment.userName}`}
-          style={{ width: '100px', marginRight: '10px', cursor: 'pointer' }}
-          onClick={() => handleImageClick(`http://localhost:3001/${image}`)}
-        />
-      ))}
-    </div>
-  ))}
-</div>
-
-
-
-
-        {/* Custom Modal for image zoom */}
+          </div>
+        </div>
         {showModal && (
           <div 
             style={{ 
@@ -203,7 +238,7 @@ function RoomDetails({ roomDetails, setRoomDetails, roomNumber }) {
                 maxHeight: '90%', 
                 cursor: 'pointer' 
               }}
-              onClick={(e) => e.stopPropagation()} // Prevents closing when clicking on the image
+              onClick={(e) => e.stopPropagation()} 
             />
           </div>
         )}

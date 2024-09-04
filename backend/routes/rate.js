@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const Hostel = require('../models/Hostel');
 
-// Route to submit a rating
 router.post('/rate', async (req, res) => {
   console.log('Rate route hit');
   try {
@@ -37,7 +36,6 @@ router.post('/rate', async (req, res) => {
   }
 });
 
-// Route to fetch a user's rating for a specific hostel
 router.get('/hostel/:hostel/user-rating/:userId', async (req, res) => {
   try {
     const { hostel, userId } = req.params;
@@ -61,8 +59,6 @@ router.get('/hostel/:hostel/user-rating/:userId', async (req, res) => {
   }
 });
 
-
-// Route to fetch average ratings
 router.get('/hostel/:hostel/average-rating', async (req, res) => {
   try {
     const hostelName = req.params.hostel;

@@ -1,23 +1,20 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const nodemailer = require('nodemailer'); // Import Nodemailer
+const nodemailer = require('nodemailer'); 
 const User = require('../models/User');
 const router = express.Router();
 
-// Store OTPs temporarily (in-memory store for simplicity; for production, use a database or cache)
 const otps = {};
 
-// Configure Nodemailer transporter
 const transporter = nodemailer.createTransport({
-    service: 'gmail', // Use your email service provider
+    service: 'gmail',
     auth: {
-        user: 'yraj_be21@thapar.edu', // Replace with your email
-        pass: 'sdpe eymq xtea chpt', // Replace with your email password or app password if 2FA is enabled
+        user: 'yraj_be21@thapar.edu', 
+        pass: 'sdpe eymq xtea chpt', 
     },
 });
 
-// Sign Up - Step 1: Initiate Sign Up and Send OTP
 router.post('/signup', async (req, res) => {
     const { email, name, gender, year, password } = req.body;
 
@@ -29,13 +26,11 @@ router.post('/signup', async (req, res) => {
         const user = await User.findOne({ email });
         const userExists = !!user;
 
-        // Generate and store OTP
-        const otp = Math.floor(100000 + Math.random() * 900000).toString(); // Generate a 6-digit OTP
+        const otp = Math.floor(100000 + Math.random() * 900000).toString(); 
         otps[email] = { otp, name, gender, year, password, userExists };
 
-        // Send OTP via email
         const mailOptions = {
-            from: 'linkitallnow@gmail.com', // Replace with your email
+            from: 'linkitallnow@gmail.com', 
             to: email,
             subject: 'Your OTP for Sign Up',
             text: `Your OTP is ${otp}. Please use this to complete your sign-up process.`,
@@ -55,7 +50,6 @@ router.post('/signup', async (req, res) => {
     }
 });
 
-// Sign Up - Step 2: Verify OTP and Complete Sign Up or Password Reset
 router.post('/verify-otp', async (req, res) => {
     const { email, otp } = req.body;
 
@@ -73,7 +67,7 @@ router.post('/verify-otp', async (req, res) => {
         const { name, gender, year, password, userExists } = otpData;
 
         if (userExists) {
-    // If the user exists, update their password and year
+
     const hashedPassword = await bcrypt.hash(password, 12);
     await User.updateOne(
         { email },
@@ -81,14 +75,13 @@ router.post('/verify-otp', async (req, res) => {
     );
     res.status(200).json({ message: 'Password and year updated successfully' });
 } else {
-    // If the user does not exist, create a new user
+    
     const hashedPassword = await bcrypt.hash(password, 12);
     const newUser = new User({ email, name, gender, year, password: hashedPassword });
     await newUser.save();
     res.status(201).json({ message: 'User registered successfully' });
 }
 
-        // Clean up OTP after successful verification
         delete otps[email];
     } catch (error) {
         console.error('OTP Verification Error:', error);
@@ -96,7 +89,6 @@ router.post('/verify-otp', async (req, res) => {
     }
 });
 
-// Sign In
 router.post('/signin', async (req, res) => {
     const { email, password } = req.body;
 
