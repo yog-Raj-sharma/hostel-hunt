@@ -28,7 +28,7 @@ export default function Hostel() {
     'Airtel', 'NesCafe', 'Aahar(Uncle)', 'Aahar(Auntty)', 'Old Aahar', 
     'G-block Cafeteria', "Jaggi's Coffee Shop", "Jaggi's Juice Shop", 'Hostel H Canteen'
     ]) {
-      const response = await fetch(`http://localhost:3001/api/hostel/${encodeURIComponent(hostel)}/user-rating/${userId}`);
+      const response = await fetch(`https://hostel-hunt-1.onrender.com/api/hostel/${encodeURIComponent(hostel)}/user-rating/${userId}`);
       if (!response.ok) {
         const text = await response.text();
         console.error(`Failed to fetch user rating for ${hostel}: ${text}`);
@@ -57,7 +57,7 @@ export default function Hostel() {
       const avgRatings = {};
 
       for (const hostel of hostels) {
-        const response = await fetch(`http://localhost:3001/api/hostel/${encodeURIComponent(hostel)}/average-rating`);
+        const response = await fetch(`https://hostel-hunt-1.onrender.com/api/hostel/${encodeURIComponent(hostel)}/average-rating`);
 
         if (!response.ok) {
           const text = await response.text();
@@ -130,7 +130,7 @@ export default function Hostel() {
         return;
       }
        console.log('Sending rating data:', { hostel, user: userId, rating });
-      const response = await fetch('http://localhost:3001/api/rate', {
+      const response = await fetch('https://hostel-hunt-1.onrender.com/api/rate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ hostel, user: userId, rating }),
