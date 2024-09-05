@@ -22,7 +22,7 @@ export default function SignUpPage() {
         } 
 
         try {
-            const response = await axios.post('https://hostel-hunt-1.onrender.com/api/hostel/api/auth/signup', {
+            const response = await axios.post('http://localhost:3001/api/auth/signup', {
                 email,
                 password,
                 name,
@@ -43,7 +43,7 @@ export default function SignUpPage() {
 
     const handleVerifyOtp = async () => {
         try {
-            const response = await axios.post('https://hostel-hunt-1.onrender.com/api/hostel/api/auth/verify-otp', {
+            const response = await axios.post('http://localhost:3001/api/auth/verify-otp', {
                 email,
                 otp,
                 userExists,

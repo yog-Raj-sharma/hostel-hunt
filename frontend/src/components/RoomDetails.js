@@ -21,8 +21,8 @@ function RoomDetails({ roomDetails = { comments: [] }, setRoomDetails, roomNumbe
       return userNames[userId]; 
     }
 
-    try { 
-      const response = await fetch(`https://hostel-hunt-1.onrender.com/api/hostel/api/profile/${userId}`);
+    try {
+      const response = await fetch(`http://localhost:3001/api/profile/${userId}`);
       if (!response.ok) {
         console.error('Failed to fetch user name:', response.statusText);
         return 'Unknown User';
@@ -96,7 +96,7 @@ function RoomDetails({ roomDetails = { comments: [] }, setRoomDetails, roomNumbe
         formData.append('images', image);
       });
 
-      const response = await fetch(`https://hostel-hunt-1.onrender.com/api/hostel/api/rooms/${roomDetails.hostel}/${roomDetails.roomNumber}/comments`, {
+      const response = await fetch(`http://localhost:3001/api/rooms/${roomDetails.hostel}/${roomDetails.roomNumber}/comments`, {
         method: 'POST',
         body: formData,
       });
@@ -193,26 +193,28 @@ function RoomDetails({ roomDetails = { comments: [] }, setRoomDetails, roomNumbe
         </div>
         <div>
           <div className="card p-3 mb-3 shadow-sm bg-light text-dark">
-            {roomDetails.comments?.map((comment, index) => (
-              <div key={index} className="mb-4 p-3 bg-light border border-secondary rounded">
-                <p style={{ color: 'black' }}>
-                  <strong>{userNames[comment.userId] || 'Loading...'}</strong> 
-                  <span style={{ marginLeft: '10px', color: 'gray', fontSize: '12px' }}>
-                    Posted on:  {new Date(comment.timestamp).toLocaleDateString()} 
-                  </span>
-                </p>
-                <p style={{ color: 'black' }}>{comment.text}</p>
-                {comment.images.map((image, idx) => (
-                  <img
-                    key={idx}
-                    src={`https://hostel-hunt-1.onrender.com/api/hostel/${image}`}
-                    alt={`Uploaded by ${userNames[comment.userId] || 'User'}`}
-                    style={{ width: '100px', marginRight: '10px', cursor: 'pointer' }}
-                    onClick={() => handleImageClick(`https://hostel-hunt-1.onrender.com/api/hostel/${image}`)}
-                  />
-                ))}
-              </div>
-            ))}
+             {roomDetails.comments?.map((comment, index) => (
+  <div key={index} className="mb-4 p-3 bg-light border border-secondary rounded">
+    <p style={{ color: 'black' }}>
+      <strong>{userNames[comment.userId] || 'Loading...'}</strong> 
+       <span style={{ marginLeft: '10px', color: 'gray', fontSize: '12px' }}>
+      Posted on:  {new Date(comment.timestamp).toLocaleDateString()} {/* Display the date */}
+      </span>
+
+    </p>
+    <p style={{ color: 'black' }}>{comment.text}</p>
+    {comment.images.map((image, idx) => (
+      <img
+        key={idx}
+        src={`http://localhost:3001/${image}`}
+        alt={`Uploaded by ${userNames[comment.userId] || 'User'}`}
+        style={{ width: '100px', marginRight: '10px', cursor: 'pointer' }}
+        onClick={() => handleImageClick(`http://localhost:3001/${image}`)}
+      />
+    ))}
+  </div>
+))}
+
           </div>
         </div>
         {showModal && (

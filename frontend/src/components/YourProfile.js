@@ -21,7 +21,7 @@ export default function YourProfile() {
 
   const fetchUserInfo = async (userId) => {
     try {
-      const response = await axios.get(`https://hostel-hunt-1.onrender.com/api/hostel/api/profile/${userId}`);
+      const response = await axios.get(`http://localhost:3001/api/profile/${userId}`);
       setUserInfo(response.data);
     } catch (error) {
       console.error('Failed to fetch user info:', error);
@@ -30,7 +30,7 @@ export default function YourProfile() {
 
   const fetchUserItems = async (userId) => {
     try {
-      const response = await axios.get(`https://hostel-hunt-1.onrender.com/api/hostel/api/user-items/${userId}`);
+      const response = await axios.get(`http://localhost:3001/api/user-items/${userId}`);
       setItems(response.data);
     } catch (error) {
       console.error('Failed to fetch items:', error);
@@ -43,7 +43,7 @@ export default function YourProfile() {
       const decoded = jwtDecode(token);
       const userId = decoded.userId;
 
-      await axios.delete(`https://hostel-hunt-1.onrender.com/api/hostel/api/items/${itemId}`, { data: { userId } });
+      await axios.delete(`http://localhost:3001/api/items/${itemId}`, { data: { userId } });
       setItems(items.filter(item => item._id !== itemId));
     } catch (error) {
       console.error('Failed to mark item as sold:', error);
