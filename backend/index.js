@@ -8,12 +8,20 @@ const roomRoutes = require('./routes/room');
 const foodItemsRoutes = require('./routes/foodItemsRoutes');
 const profileroutes = require('./routes/YourProfileRoutes');
 const app = express();
+  
+const allowedOrigins = ['https://hostel-hunt-4.onrender.com', 'http://localhost:3000'];
 
-// CORS configuration to allow requests only from your frontend
 app.use(cors({
-  origin: 'https://hostel-hunt-4.onrender.com',  
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],    
-  credentials: true                              
+  origin: function (origin, callback) {
+    
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = 'The CORS policy for this site does not allow access from the specified origin.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  }
 }));
 
 app.use(express.json());

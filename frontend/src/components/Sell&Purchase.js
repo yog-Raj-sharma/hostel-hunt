@@ -16,7 +16,7 @@ export default function Sell() {
 
   const fetchItems = async () => {
     try {
-      const response = await axios.get('https://hostel-hunt-1.onrender.com/api/hostel/api/items');
+      const response = await axios.get('https://hostel-hunt-1.onrender.com/api/items');
       setItems(response.data);
     } catch (error) {
       console.error('Failed to fetch items:', error);
@@ -49,7 +49,7 @@ export default function Sell() {
     formData.append('userId', userId);
 
     try {
-      await axios.post('https://hostel-hunt-1.onrender.com/api/hostel/api/items', formData, {
+      await axios.post('https://hostel-hunt-1.onrender.com/api/items', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -173,10 +173,10 @@ export default function Sell() {
         style={{ flexBasis: '10%', display: 'flex', justifyContent: 'center' }}
       >
         <img
-          src={`https://hostel-hunt-1.onrender.com/api/hostel/${item.image}`}
+          src={`https://hostel-hunt-1.onrender.com/${item.image}`}
           alt={item.name}
           style={{ width: '50px', height: '50px', borderRadius: '4px', cursor: 'pointer' }}
-          onClick={() => handleImageClick(`https://hostel-hunt-1.onrender.com/api/hostel/${item.image}`)}
+          onClick={() => handleImageClick(`https://hostel-hunt-1.onrender.com/${item.image}`)}
         />
       </div>
       <span

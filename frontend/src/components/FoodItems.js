@@ -9,7 +9,7 @@ export default function FoodItems({ outlet }) {
   // UseCallback to memoize the fetch function
   const fetchFoodItems = useCallback(async () => {
     try {
-      const response = await fetch(`https://hostel-hunt-1.onrender.com/api/hostel/api/food-items/${encodeURIComponent(outlet)}`);
+      const response = await fetch(`https://hostel-hunt-1.onrender.com/api/food-items/${encodeURIComponent(outlet)}`);
 
       if (!response.ok) {
         const text = await response.text();
@@ -38,7 +38,7 @@ export default function FoodItems({ outlet }) {
     }
 
     try {
-      const response = await fetch(`https://hostel-hunt-1.onrender.com/api/hostel/api/food-items/${encodeURIComponent(outlet)}`, {
+      const response = await fetch(`https://hostel-hunt-1.onrender.com/api/food-items/${encodeURIComponent(outlet)}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: newFoodName }),
