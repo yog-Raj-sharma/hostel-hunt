@@ -20,7 +20,7 @@ function RoomDetails({ roomDetails = { comments: [] }, setRoomDetails, roomNumbe
     }
 
     try {
-      const response = await fetch(`http://localhost:3001/api/profile/${userId}`);
+      const response = await fetch(`https://hostel-hunt-1.onrender.com/api/profile/${userId}`);
       if (!response.ok) {
         console.error('Failed to fetch user name:', response.statusText);
         return 'Unknown User';
@@ -93,7 +93,7 @@ function RoomDetails({ roomDetails = { comments: [] }, setRoomDetails, roomNumbe
         formData.append('images', image);
       });
 
-      const response = await fetch(`http://localhost:3001/api/rooms/${roomDetails.hostel}/${roomDetails.roomNumber}/comments`, {
+      const response = await fetch(`https://hostel-hunt-1.onrender.com/api/rooms/${roomDetails.hostel}/${roomDetails.roomNumber}/comments`, {
         method: 'POST',
         body: formData,
       });
@@ -203,10 +203,10 @@ function RoomDetails({ roomDetails = { comments: [] }, setRoomDetails, roomNumbe
     {comment.images.map((image, idx) => (
       <img
         key={idx}
-        src={`http://localhost:3001/${image}`}
+        src={`https://hostel-hunt-1.onrender.com/${image}`}
         alt={`Uploaded by ${userNames[comment.userId] || 'User'}`}
         style={{ width: '100px', marginRight: '10px', cursor: 'pointer' }}
-        onClick={() => handleImageClick(`http://localhost:3001/${image}`)}
+        onClick={() => handleImageClick(`https://hostel-hunt-1.onrender.com/${image}`)}
       />
     ))}
   </div>
