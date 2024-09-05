@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer'); 
 const User = require('../models/User');
 const router = express.Router();
+require('dotenv').config(); 
 
 const otps = {};
 
@@ -107,7 +108,8 @@ router.post('/signin', async (req, res) => {
             return res.status(401).json({ error: 'Invalid email or password' });
         }
 
-        const token = jwt.sign({ userId: user._id }, 'your_jwt_secret', { expiresIn: '1h' });
+        // Use the JWT secret from the environment variable
+        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
         res.status(200).json({ message: 'Sign In successful', token });
     } catch (error) {
         console.error('Sign In Error:', error);

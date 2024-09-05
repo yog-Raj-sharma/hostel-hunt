@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
+require('dotenv').config();  // Ensure this line is included to load environment variables
 
-mongoose.connect('mongodb://127.0.0.1:27017/hostel-hunt')
+const dbPassword = process.env.DB_PASSWORD;
+
+mongoose.connect(`mongodb+srv://yograjsharma:${dbPassword}@cluster0.7o0rg75.mongodb.net/hostel-hunt`, {
+})
   .then(() => {
     console.log('Connected to MongoDB');
   })

@@ -24,3 +24,5 @@ app.use('/uploads', express.static('uploads'));
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+//mongodb+srv://yograjsharma:<db_password>@cluster0.7o0rg75.mongodb.net/?//
