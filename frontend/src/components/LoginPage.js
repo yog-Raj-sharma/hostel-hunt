@@ -11,7 +11,7 @@ export default function LoginPage() {
     const handleSignIn = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('http://localhost:3001/api/auth/signin', { email, password });
+            const response = await axios.post('https://hostel-hunt-1.onrender.com/api/auth/signin', { email, password });
             const { token } = response.data;
 
             if (token) {
