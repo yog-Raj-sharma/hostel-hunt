@@ -69,9 +69,30 @@ export default function NavBar() {
               ></span>
             </button>
             <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-              <li><a className="dropdown-item" href="#" onClick={() => toggleComponent('profile')}>Your Profile</a></li>
-              <li><a className="dropdown-item" href="#" onClick={handleSignOut}>Sign Out</a></li>
-              <li><a className="dropdown-item" href="#" onClick={handleContactUs}>Contact Us</a></li>
+              <li>
+  <button 
+    className="dropdown-item" 
+    onClick={() => toggleComponent('profile')} 
+    style={{ background: 'none', border: 'none',  padding: '5px 15px', color: 'black', textDecoration: 'none', cursor: 'pointer' }}>
+    Your Profile
+  </button>
+</li> 
+<li>
+  <button 
+    className="dropdown-item" 
+    onClick={handleSignOut} 
+    style={{ background: 'none', border: 'none',  padding: '5px 15px',  color: 'black', textDecoration: 'none', cursor: 'pointer' }}>
+    Sign Out
+  </button>
+</li>
+<li>
+  <button 
+    className="dropdown-item" 
+    onClick={handleContactUs} 
+    style={{ background: 'none', border: 'none',  padding: '5px 15px',  color: 'black', textDecoration: 'none', cursor: 'pointer' }}>
+    Contact Us
+  </button>
+</li>
             </ul>
           </div>
 
@@ -87,14 +108,29 @@ export default function NavBar() {
           <div className="collapse navbar-collapse" id="navbarSupportedContent">
             <ul className="navbar-nav me-auto mb-2 mb-lg-0">
               <li className="nav-item">
-                <a className="nav-link" aria-current="page" href="#" onClick={() => toggleComponent('hostels')} style={{ color: navbarStyle.color }}>Hostel</a>
-              </li>
-              <li className="nav-item">
-                <a className="nav-link" aria-current="page" href="#" onClick={() => toggleComponent('outlets')} style={{ color: navbarStyle.color }}>Outlet/Store</a>
-              </li>
-              <li className="nav-item">
-                <a className="nav-link" aria-current="page" href="#" onClick={() => toggleComponent('sell')} style={{ color: navbarStyle.color }}>Sell/Purchase</a>
-              </li>
+  <button 
+    className="nav-link" 
+    onClick={() => toggleComponent('hostels')} 
+    style={{ background: 'none', border: 'none', padding: '0 10px', color: navbarStyle.color, textDecoration: 'none', cursor: 'pointer' }}>
+    Hostel
+  </button>
+</li>
+<li className="nav-item">
+  <button 
+    className="nav-link" 
+    onClick={() => toggleComponent('outlets')} 
+    style={{ background: 'none', border: 'none', padding: '0 10px', color: navbarStyle.color, textDecoration: 'none', cursor: 'pointer' }}>
+    Outlet/Store
+  </button>
+</li>
+<li className="nav-item">
+  <button 
+    className="nav-link" 
+    onClick={() => toggleComponent('sell')} 
+    style={{ background: 'none', border: 'none', padding: '0 10px', color: navbarStyle.color, textDecoration: 'none', cursor: 'pointer' }}>
+    Sell/Purchase
+  </button>
+</li>
             </ul>
 
             <div className="form-check form-switch">
@@ -122,4 +158,4 @@ export default function NavBar() {
       </div>
     </>
   );
-}
+}  

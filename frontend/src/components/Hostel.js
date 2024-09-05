@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
 import { jwtDecode } from 'jwt-decode';
@@ -14,13 +14,8 @@ export default function Hostel() {
   const [selectedImages, setSelectedImages] = useState([]);
   const [searchedRooms, setSearchedRooms] = useState({});
   const [userRatings, setUserRatings] = useState({});
- 
-  useEffect(() => {
-    fetchAverageRatings();
-    fetchUserRatings();
-  }, []);
 
-  const fetchAverageRatings = async () => {
+    const fetchAverageRatings = useCallback(async () => {
     try {
       const hostels = [
         'Hostel A', 'Hostel B', 'Hostel C', 'Hostel D', 'Hostel E',
@@ -32,7 +27,7 @@ export default function Hostel() {
       const avgRatings = {};
 
       for (const hostel of hostels) {
-        const response = await fetch(`http://localhost:3001/api/hostel/${encodeURIComponent(hostel)}/average-rating`);
+        const response = await fetch(`https://hostel-hunt-1.onrender.com/api/hostel/api/hostel/${encodeURIComponent(hostel)}/average-rating`);
 
         if (!response.ok) {
           const text = await response.text();
@@ -48,40 +43,48 @@ export default function Hostel() {
     } catch (error) {
       console.error('Failed to fetch average ratings:', error);
     }
-  };
+  }, []);
 
-  const fetchUserRatings = async () => {
-  try {
-    const userId = getUserIdFromToken();
-    if (!userId) return;
+    const fetchUserRatings = useCallback(async () => {
+    try {
+      const userId = getUserIdFromToken();
+      if (!userId) return;
 
-    const ratings = {};
+      const ratings = {};
 
-    for (const hostel of [
-      'Hostel A', 'Hostel B', 'Hostel C', 'Hostel D', 'Hostel E',
-      'Hostel F', 'Hostel FR-F', 'Hostel FR-G', 'Hostel G', 'Hostel H',
-      'Hostel I', 'Hostel J', 'Hostel K', 'Hostel L', 'Hostel M',
-      'Hostel N', 'Hostel O', 'Hostel PG', 'Hostel Q'
-    ]) {
-      const response = await fetch(`http://localhost:3001/api/hostel/${encodeURIComponent(hostel)}/user-rating/${userId}`);
-      if (!response.ok) {
-        const text = await response.text();
-        console.error(`Failed to fetch user rating for ${hostel}: ${text}`);
-        continue;
+      for (const hostel of [
+        'Hostel A', 'Hostel B', 'Hostel C', 'Hostel D', 'Hostel E',
+        'Hostel F', 'Hostel FR-F', 'Hostel FR-G', 'Hostel G', 'Hostel H',
+        'Hostel I', 'Hostel J', 'Hostel K', 'Hostel L', 'Hostel M',
+        'Hostel N', 'Hostel O', 'Hostel PG', 'Hostel Q'
+      ]) {
+        const response = await fetch(`https://hostel-hunt-1.onrender.com/api/hostel/api/hostel/${encodeURIComponent(hostel)}/user-rating/${userId}`);
+        if (!response.ok) {
+          const text = await response.text();
+          console.error(`Failed to fetch user rating for ${hostel}: ${text}`);
+          continue;
+        }
+
+        const data = await response.json();
+        ratings[hostel] = data.rating || 0;
       }
 
-      const data = await response.json();
-      ratings[hostel] = data.rating || 0;
+      setUserRatings(ratings);
+    } catch (error) {
+      console.error('Failed to fetch user ratings:', error);
     }
+  }, []);
 
-    setUserRatings(ratings);
-  } catch (error) {
-    console.error('Failed to fetch user ratings:', error);
-  }
-};
-  const handleExpandClick = (index) => {
+   
+    useEffect(() => {
+    fetchAverageRatings();
+    fetchUserRatings();
+  }, [fetchAverageRatings, fetchUserRatings]);
+
+   const handleExpandClick = (index) => {
     setExpandedIndex(expandedIndex === index ? -1 : index);
   };
+
 
   const handleStarClick = (hostel, rating) => {
     setSelectedRatings((prevRatings) => ({
@@ -115,7 +118,7 @@ export default function Hostel() {
     }
   };
 
-  const handleRateSubmit = async (hostel) => {
+  const handleRateSubmit = async (hostel) => { 
     const rating = selectedRatings[hostel];
     if (!rating) return;
 
@@ -127,7 +130,7 @@ export default function Hostel() {
         return;
       }
 
-      const response = await fetch('http://localhost:3001/api/rate', {
+      const response = await fetch('https://hostel-hunt-1.onrender.com/api/hostel/api/rate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ hostel, user: userId, rating }),
@@ -157,7 +160,7 @@ export default function Hostel() {
   }
 
   try {
-    const response = await fetch('http://localhost:3001/api/rooms', {
+    const response = await fetch('https://hostel-hunt-1.onrender.com/api/hostel/api/rooms', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ hostel, roomNumber }),
@@ -182,7 +185,7 @@ export default function Hostel() {
 };
 
 const renderExtraContent = (hostel) => {
-  const roomNumber = searchedRooms[hostel]?.trim();
+  
 
   return (
     <div
