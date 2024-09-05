@@ -12,7 +12,7 @@ export default function FoodItems({ outlet }) {
 
   const fetchFoodItems = async () => {
     try {
-      const response = await fetch(`http://localhost:3001/api/food-items/${encodeURIComponent(outlet)}`);
+      const response = await fetch(`https://hostel-hunt-1.onrender.com/api/food-items/${encodeURIComponent(outlet)}`);
 
       if (!response.ok) {
         const text = await response.text();
@@ -35,7 +35,7 @@ export default function FoodItems({ outlet }) {
     }
 
     try {
-      const response = await fetch(`http://localhost:3001/api/food-items/${encodeURIComponent(outlet)}`, {
+      const response = await fetch(`https://hostel-hunt-1.onrender.com/api/food-items/${encodeURIComponent(outlet)}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: newFoodName }),
