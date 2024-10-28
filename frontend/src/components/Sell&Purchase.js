@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-
 export default function Sell() {
   const [items, setItems] = useState([]);
   const [newItem, setNewItem] = useState({ name: '', image: null, price: '', contact: '' });
@@ -177,6 +176,7 @@ export default function Sell() {
           alt={item.name}
           style={{ width: '50px', height: '50px', borderRadius: '4px', cursor: 'pointer' }}
           onClick={() => handleImageClick(`https://hostel-hunt-1.onrender.com/${item.image}`)}
+          loading='lazy'
         />
       </div>
       <span
@@ -207,6 +207,7 @@ export default function Sell() {
                   src={imageSrc}
                   alt="Enlarged Item"
                   style={{ maxWidth: '100%', maxHeight: '80vh' }}
+                  loading='lazy'
                 />
               </div>
             </div>

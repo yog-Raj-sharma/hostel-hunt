@@ -6,7 +6,6 @@ export default function FoodItems({ outlet }) {
   const [showAddBox, setShowAddBox] = useState(false);
   const [error, setError] = useState(null); 
 
-  // UseCallback to memoize the fetch function
   const fetchFoodItems = useCallback(async () => {
     try {
       const response = await fetch(`https://hostel-hunt-1.onrender.com/api/food-items/${encodeURIComponent(outlet)}`);
@@ -23,14 +22,12 @@ export default function FoodItems({ outlet }) {
     } catch (error) {
       console.error('Failed to fetch food items:', error);
     }
-  }, [outlet]); // `outlet` dependency is required
+  }, [outlet]); 
 
-  // Call fetchFoodItems when component mounts or outlet changes
   useEffect(() => {
     fetchFoodItems();
   }, [fetchFoodItems]);
 
-  // Function to handle adding a new food item
   const handleAddFoodItem = async () => {
     if (!newFoodName.trim()) {
       setError('Food item name cannot be empty');
@@ -51,10 +48,10 @@ export default function FoodItems({ outlet }) {
         return;
       }
 
-      setNewFoodName(''); // Clear input field after successful submission
+      setNewFoodName(''); 
       setShowAddBox(false);
-      setError(null); // Reset error
-      fetchFoodItems(); // Re-fetch food items after adding a new one
+      setError(null); 
+      fetchFoodItems(); 
     } catch (error) {
       console.error('Failed to add food item:', error);
       setError('An error occurred while adding the food item');

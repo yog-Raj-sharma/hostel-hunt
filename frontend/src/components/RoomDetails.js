@@ -10,12 +10,10 @@ function RoomDetails({ roomDetails = { comments: [] }, setRoomDetails, roomNumbe
   const [selectedImages, setSelectedImages] = useState([]);
   const [userNames, setUserNames] = useState({});
  
-
   const handleClose = () => {
     setIsVisible(false);
   };
 
-  
   const fetchUserName = useCallback(async (userId) => {
     if (userNames[userId]) {
       return userNames[userId]; 
@@ -198,7 +196,7 @@ function RoomDetails({ roomDetails = { comments: [] }, setRoomDetails, roomNumbe
     <p style={{ color: 'black' }}>
       <strong>{userNames[comment.userId] || 'Loading...'}</strong> 
        <span style={{ marginLeft: '10px', color: 'gray', fontSize: '12px' }}>
-      Posted on:  {new Date(comment.timestamp).toLocaleDateString()} {/* Display the date */}
+      Posted on:  {new Date(comment.timestamp).toLocaleDateString()} 
       </span>
 
     </p>
@@ -210,6 +208,7 @@ function RoomDetails({ roomDetails = { comments: [] }, setRoomDetails, roomNumbe
         alt={`Uploaded by ${userNames[comment.userId] || 'User'}`}
         style={{ width: '100px', marginRight: '10px', cursor: 'pointer' }}
         onClick={() => handleImageClick(`https://hostel-hunt-1.onrender.com/${image}`)}
+        loading='lazy'
       />
     ))}
   </div>
@@ -236,6 +235,7 @@ function RoomDetails({ roomDetails = { comments: [] }, setRoomDetails, roomNumbe
             <img 
               src={currentImage} 
               alt="Zoomed" 
+              loading='lazy'
               style={{ 
                 maxWidth: '90%', 
                 maxHeight: '90%', 

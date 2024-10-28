@@ -2,13 +2,12 @@ import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-//https://hostel-hunt-1.onrender.com
 export default function LoginPage() {
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    const handleSignIn = async (e) => {
+    const handleSignIn = async (e) => { 
         e.preventDefault();
         try {
             const response = await axios.post('https://hostel-hunt-1.onrender.com/api/auth/signin', { email, password });

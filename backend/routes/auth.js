@@ -12,7 +12,7 @@ const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
         user: 'yraj_be21@thapar.edu', 
-        pass: 'sdpe eymq xtea chpt', 
+        pass: 'sdpe eymq xtea chpt',  
     },
 });
 
@@ -108,7 +108,6 @@ router.post('/signin', async (req, res) => {
             return res.status(401).json({ error: 'Invalid email or password' });
         }
 
-        // Use the JWT secret from the environment variable
         const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
         res.status(200).json({ message: 'Sign In successful', token });
     } catch (error) {
