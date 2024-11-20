@@ -30,8 +30,7 @@ export default function LoginPage() {
             <div className="card p-4" style={{ width: '400px', marginTop: '20px' }}>
                 <div className="alert alert-info" role="alert">
                     Loading of Page on login can take approx 1 minute since it is hosted for free. Please Wait!<br />
-                    Use the following credentials for testing: Student Login (Email: “yraj_be21@thapar.edu”, Password: “Hellouser”)
-                    Admin Login (Email: “ksingh10”, Password: “Hellouser”)
+                    Use the following credentials for testing: Email: “yraj_be21@thapar.edu”, Password: “Hellouser”
                 </div>
                 <form> 
                     <div className="mb-3">
