@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-require('dotenv').config();  // Ensure this line is included to load environment variables
+require('dotenv').config();  
 
 const dbPassword = process.env.DB_PASSWORD;
 

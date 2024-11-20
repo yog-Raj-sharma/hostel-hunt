@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+
 export default function LoginPage() {
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
@@ -27,7 +28,12 @@ export default function LoginPage() {
     return (
         <div className="d-flex justify-content-center align-items-start vh-100 bg-dark">
             <div className="card p-4" style={{ width: '400px', marginTop: '20px' }}>
-                <form>
+                <div className="alert alert-info" role="alert">
+                    Loading of Page on login can take approx 1 minute since it is hosted for free. Please Wait!<br />
+                    Use the following credentials for testing: Student Login (Email: “yraj_be21@thapar.edu”, Password: “Hellouser”)
+                    Admin Login (Email: “ksingh10”, Password: “Hellouser”)
+                </div>
+                <form> 
                     <div className="mb-3">
                         <input 
                             type="text" 
@@ -66,4 +72,4 @@ export default function LoginPage() {
             </div>
         </div>
     );
-}
+} 

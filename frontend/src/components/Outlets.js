@@ -45,8 +45,7 @@ export default function Hostel() {
 
   fetchAverageRatings();
   fetchUserRatings();
-}, []); // empty dependency array ensures it runs once
-
+}, []); 
 
   const fetchAverageRatings = async () => {
     try {
