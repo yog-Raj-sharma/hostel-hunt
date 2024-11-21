@@ -169,7 +169,8 @@ export default function SignUpPage() {
                             willChange: 'transform',
                         }}
                     >
-                        Only Password and Year will be updated of existing users.
+                        Only Password and Year will be updated of existing users. <br />
+                        Only Thapar email id(@thapar.edu) can be used for Sign up.
                     </div>
                 </div>
             
