@@ -64,7 +64,7 @@ function RoomDetails({ roomDetails = { comments: [] }, setRoomDetails, roomNumbe
       const decodedToken = jwtDecode(token);
       const expiry = decodedToken.exp * 1000;
       const now = Date.now();
-
+ 
       if (now > expiry) {
         console.error('Token has expired');
         localStorage.removeItem('authToken');
@@ -91,7 +91,7 @@ function RoomDetails({ roomDetails = { comments: [] }, setRoomDetails, roomNumbe
       formData.append('text', commentText);
       formData.append('userId', userId);
       selectedImages.forEach((image) => {
-        formData.append('images', image);
+       formData.append('images', image);
       });
 
       const response = await fetch(`https://hostel-hunt-1.onrender.com/api/rooms/${roomDetails.hostel}/${roomDetails.roomNumber}/comments`, {

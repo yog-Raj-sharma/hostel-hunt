@@ -4,7 +4,7 @@ import 'bootstrap/dist/js/bootstrap.bundle.min';
 import { jwtDecode } from 'jwt-decode';
 import RoomDetails from './RoomDetails';
 
-export default function Hostel() {
+export default  function Hostel() {
   const [expandedIndex, setExpandedIndex] = useState(-1);
   const [selectedRatings, setSelectedRatings] = useState({});
   const [averageRatings, setAverageRatings] = useState({});

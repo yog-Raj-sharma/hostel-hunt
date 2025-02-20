@@ -24,14 +24,19 @@ export default function LoginPage() {
             alert(error.response?.data?.error || "Error during sign in");
         }
     };
-
     return (
         <div className="d-flex justify-content-center align-items-start vh-100 bg-dark">
             <div className="card p-4" style={{ width: '400px', marginTop: '20px' }}>
-                <div className="alert alert-info" role="alert">
+                {/*<div className="alert alert-info" role="alert">
                     Loading of Page on login can take approx 1 minute since it is hosted for free. Please Wait!<br />
+                    Sign Up using Thapar email id (@thapar.edu) OR <br /> 
                     Use the following credentials for testing: Email: “yraj_be21@thapar.edu”, Password: “Hellouser”
+                </div> */}
+
+                  <div className="alert alert-info" role="alert">
+                    Currently databse for this website is Disabled. <br />
                 </div>
+
                 <form> 
                     <div className="mb-3">
                         <input 
