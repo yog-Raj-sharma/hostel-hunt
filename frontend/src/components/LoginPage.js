@@ -30,8 +30,8 @@ export default function LoginPage() {
                 <div className="alert alert-info" role="alert">
                     Loading of Page on login can take approx 1 minute since it is hosted for free. Please Wait!<br />
                     Sign Up using Thapar email id (@thapar.edu) OR <br /> 
-                    Use the following credentials for testing: Email: “yraj_be21@thapar.edu”, Password: “Hellouser”
-                </div> =
+                    Use the following credentials for testing: Email: “yraj_be21@thapar.edu”,<br/> Password: “Hellouser”
+                </div> 
 
                 <form> 
                     <div className="mb-3">
