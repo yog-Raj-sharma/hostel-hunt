@@ -28,7 +28,7 @@ app.use(express.json());
 
 app.use('/api/auth', authRoutes);
 app.use('/api', rateRoutes);
-app.use('/api', itemRoutes); 
+app.use('/api/items', itemRoutes); 
 app.use('/api/rooms', roomRoutes); 
 app.use('/api/food-items', foodItemsRoutes); 
 app.use('/api/', profileroutes);
