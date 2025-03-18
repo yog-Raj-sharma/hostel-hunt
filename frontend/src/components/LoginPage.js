@@ -5,11 +5,11 @@ import axios from 'axios';
 
 export default function LoginPage() {
     const navigate = useNavigate();
-    const [email, setEmail] = useState('yraj_be21@thapar.edu');
-    const [password, setPassword] = useState('Hellouser');
+    const [email, setEmail] = useState();
+    const [password, setPassword] = useState();
 
     const handleSignIn = async (e) => { 
-        e.preventDefault();
+      e.preventDefault();
         try {
             const response = await axios.post('https://hostel-hunt-1.onrender.com/api/auth/signin', { email, password });
             const { token } = response.data;
@@ -27,12 +27,11 @@ export default function LoginPage() {
     return (
         <div className="d-flex justify-content-center align-items-start vh-100 bg-dark">
             <div className="card p-4" style={{ width: '400px', marginTop: '20px' }}>
-                <div className="alert alert-info" role="alert">
-                    Loading of Page on login can take approx 1 minute since it is hosted for free. Please Wait!<br />
-                    Sign Up using Thapar email id (@thapar.edu) OR <br /> 
-                    Use the following credentials for testing: Email: “yraj_be21@thapar.edu”,<br/> Password: “Hellouser”
-                </div> 
 
+               <div className="alert alert-info" role="alert">
+                    Loading of Page on login can take approx 1 minute since it is hosted for free. Please Wait!<br />
+                </div>  
+               
                 <form> 
                     <div className="mb-3">
                         <input 
@@ -65,7 +64,18 @@ export default function LoginPage() {
                             className="btn btn-secondary" 
                             onClick={() => navigate('/signup')}
                         >
-                            Sign Up / Forget Password
+                            Sign Up / Forgot Password
+                        </button>
+
+                        <button 
+                            type="button" 
+                            className="btn btn-warning" 
+                            onClick={() => { 
+                                setEmail('yraj_be21@thapar.edu');
+                                setPassword('Hellouser');
+                                }}
+                        >
+                            Guest Sign In
                         </button>
                     </div>
                 </form>
