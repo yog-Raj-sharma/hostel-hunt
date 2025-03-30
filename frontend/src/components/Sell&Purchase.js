@@ -12,13 +12,13 @@ export default function Sell() {
   useEffect(() => {
     fetchItems();
   }, []);
-
+ 
   const fetchItems = async () => {
     try {
       const response = await axios.get('https://hostel-hunt-1.onrender.com/api/items');
       setItems(response.data);
     } catch (error) {
-      console.error('Failed to fetch items:', error);
+      console.error('Unable to get items from backend  :', error);
     }
   };
 

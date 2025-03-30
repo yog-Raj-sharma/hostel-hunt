@@ -2,7 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const Item = require('../models/Item');
 const router = express.Router();
- 
+
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, 'uploads/');
@@ -14,7 +14,8 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-router.post('/items', upload.single('image'), async (req, res) => {
+// POST /api/items
+router.post('/', upload.single('image'), async (req, res) => {
   const { name, price, contact, userId } = req.body;
   const image = req.file.path;
 
@@ -27,7 +28,8 @@ router.post('/items', upload.single('image'), async (req, res) => {
   }
 });
 
-router.get('/items', async (req, res) => {
+// GET /api/items
+router.get('/', async (req, res) => {
   try {
     const items = await Item.find();
     res.status(200).json(items);
