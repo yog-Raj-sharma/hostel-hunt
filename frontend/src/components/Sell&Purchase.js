@@ -1,6 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
+
+const API_BASE_URL = 'https://hostel-hunt-1.onrender.com';
+
+const parseToken = (token) => {
+  try {
+    return JSON.parse(atob(token.split('.')[1]));
+  } catch (error) {
+    console.error('Error parsing token:', error);
+    return null;
+  }
+};
 
 export default function Sell() {
   const [items, setItems] = useState([]);
@@ -9,34 +20,33 @@ export default function Sell() {
   const [showImage, setShowImage] = useState(false);
   const [imageSrc, setImageSrc] = useState('');
 
-  useEffect(() => {
-    fetchItems();
-  }, []);
- 
-  const fetchItems = async () => {
+  const fetchItems = useCallback(async () => {
     try {
-      const response = await axios.get('https://hostel-hunt-1.onrender.com/api/items');
+      const response = await axios.get(`${API_BASE_URL}/api/items`);
       setItems(response.data);
     } catch (error) {
-      console.error('Unable to get items from backend  :', error);
+      console.error('Unable to get items from backend:', error);
     }
-  };
+  }, []);
 
-  const handleAddItemClick = () => {
+  useEffect(() => {
+    fetchItems();
+  }, [fetchItems]);
+
+  const handleAddItemClick = useCallback(() => {
     setShowForm(true);
-  }; 
-
-  const handleInputChange = (e) => {
+  }, []);
+  const handleInputChange = useCallback((e) => {
     const { name, value } = e.target;
-    setNewItem({ ...newItem, [name]: value });
-  };
+    setNewItem((prev) => ({ ...prev, [name]: value }));
+  }, []);
 
-  const handleImageChange = (e) => {
+  const handleImageChange = useCallback((e) => {
     const file = e.target.files[0];
-    setNewItem({ ...newItem, image: file });
-  };
+    setNewItem((prev) => ({ ...prev, image: file }));
+  }, []);
 
-  const handleSubmit = async () => {
+  const handleSubmit = useCallback(async () => {
     const formData = new FormData();
     formData.append('name', newItem.name);
     formData.append('price', newItem.price);
@@ -44,36 +54,30 @@ export default function Sell() {
     formData.append('image', newItem.image);
 
     const token = localStorage.getItem('authToken');
-    const userId = parseToken(token).userId; 
+    const parsedToken = parseToken(token);
+    const userId = parsedToken ? parsedToken.userId : null;
+    if (!userId) return;
     formData.append('userId', userId);
 
     try {
-      await axios.post('https://hostel-hunt-1.onrender.com/api/items', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+      await axios.post(`${API_BASE_URL}/api/items`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
-
       setNewItem({ name: '', image: null, price: '', contact: '' });
       setShowForm(false);
       fetchItems();
     } catch (error) {
       console.error('Failed to save item:', error);
     }
-  };
-
-  const parseToken = (token) => {
-    return JSON.parse(atob(token.split('.')[1]));
-  };
-
-  const handleImageClick = (src) => {
+  }, [newItem, fetchItems]);
+  const handleImageClick = useCallback((src) => {
     setImageSrc(src);
     setShowImage(true);
-  };
+  }, []);
 
-  const handleCloseModal = () => {
+  const handleCloseModal = useCallback(() => {
     setShowImage(false);
-  };
+  }, []);
 
   return (
     <div style={{ width: '80%', margin: '0 auto' }}>
@@ -156,46 +160,60 @@ export default function Sell() {
       )}
 
       {items.map((item) => (
-  <nav
-    className="navbar navbar-dark bg-dark"
-    key={item._id}
-    style={{ marginTop: '1rem', padding: '1rem' }}
-  >
-    <div className="container-fluid d-flex justify-content-between align-items-center">
-      <span
-        className="text-white"
-        style={{ flexBasis: '25%', textAlign: 'left', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
-      >
-        {item.name}
-      </span>
-      <div
-        style={{ flexBasis: '10%', display: 'flex', justifyContent: 'center' }}
-      >
-        <img
-          src={`https://hostel-hunt-1.onrender.com/${item.image}`}
-          alt={item.name}
-          style={{ width: '50px', height: '50px', borderRadius: '4px', cursor: 'pointer' }}
-          onClick={() => handleImageClick(`https://hostel-hunt-1.onrender.com/${item.image}`)}
-          loading='lazy'
-        />
-      </div>
-      <span
-        className="text-white"
-        style={{ flexBasis: '15%', textAlign: 'center', whiteSpace: 'nowrap' }}
-      >
-        INR {item.price}
-      </span>
-      <span
-        className="text-white"
-        style={{ flexBasis: '25%', textAlign: 'right', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
-      >
-        {item.contact}
-      </span>
-    </div>
-  </nav>
-))}
+        <nav
+          className="navbar navbar-dark bg-dark"
+          key={item._id}
+          style={{ marginTop: '1rem', padding: '1rem' }}
+        >
+          <div className="container-fluid d-flex justify-content-between align-items-center">
+            <span
+              className="text-white"
+              style={{
+                flexBasis: '25%',
+                textAlign: 'left',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
+            >
+              {item.name}
+            </span>
+            <div style={{ flexBasis: '10%', display: 'flex', justifyContent: 'center' }}>
+              <img
+                src={`${API_BASE_URL}/${item.image}`}
+                alt={item.name}
+                style={{ width: '50px', height: '50px', borderRadius: '4px', cursor: 'pointer' }}
+                onClick={() => handleImageClick(`${API_BASE_URL}/${item.image}`)}
+                loading="lazy"
+              />
+            </div>
+            <span
+              className="text-white"
+              style={{ flexBasis: '15%', textAlign: 'center', whiteSpace: 'nowrap' }}
+            >
+              INR {item.price}
+            </span>
+            <span
+              className="text-white"
+              style={{
+                flexBasis: '25%',
+                textAlign: 'right',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
+            >
+              {item.contact}
+            </span>
+          </div>
+        </nav>
+      ))}
+
       {showImage && (
-        <div className="modal show" style={{ display: 'block', position: 'absolute', top: '10%', left: '10%', width: '80%', height: '80%' }}>
+        <div
+          className="modal show"
+          style={{ display: 'block', position: 'absolute', top: '10%', left: '10%', width: '80%', height: '80%' }}
+        >
           <div className="modal-dialog modal-dialog-centered modal-lg">
             <div className="modal-content">
               <div className="modal-header">
@@ -207,7 +225,7 @@ export default function Sell() {
                   src={imageSrc}
                   alt="Enlarged Item"
                   style={{ maxWidth: '100%', maxHeight: '80vh' }}
-                  loading='lazy'
+                  loading="lazy"
                 />
               </div>
             </div>
