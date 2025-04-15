@@ -1,93 +1,116 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
-import { jwtDecode } from 'jwt-decode';
+import jwtDecode from 'jwt-decode';
 import RoomDetails from './RoomDetails';
 
-export default  function Hostel() {
+const HOSTELS = [
+  'Hostel A', 'Hostel B', 'Hostel C', 'Hostel D', 'Hostel E',
+  'Hostel F', 'Hostel FR-F', 'Hostel FR-G', 'Hostel G', 'Hostel H',
+  'Hostel I', 'Hostel J', 'Hostel K', 'Hostel L', 'Hostel M',
+  'Hostel N', 'Hostel O', 'Hostel PG', 'Hostel Q'
+];
+
+export default function Hostel() {
   const [expandedIndex, setExpandedIndex] = useState(-1);
   const [selectedRatings, setSelectedRatings] = useState({});
   const [averageRatings, setAverageRatings] = useState({});
   const [roomDetails, setRoomDetails] = useState({});
-
   const [commentText, setCommentText] = useState('');
   const [selectedImages, setSelectedImages] = useState([]);
   const [searchedRooms, setSearchedRooms] = useState({});
   const [userRatings, setUserRatings] = useState({});
+  const [isLoadingRatings, setIsLoadingRatings] = useState(false);
+  const [isLoadingUserRatings, setIsLoadingUserRatings] = useState(false);
 
-    const fetchAverageRatings = useCallback(async () => {
-  try {
-    const hostels = [
-      'Hostel A', 'Hostel B', 'Hostel C', 'Hostel D', 'Hostel E',
-      'Hostel F', 'Hostel FR-F', 'Hostel FR-G', 'Hostel G', 'Hostel H',
-      'Hostel I', 'Hostel J', 'Hostel K', 'Hostel L', 'Hostel M',
-      'Hostel N', 'Hostel O', 'Hostel PG', 'Hostel Q'
-    ];
-
-    const requests = hostels.map(async (hostel) => {
-      const response = await fetch(
-        `https://hostel-hunt-1.onrender.com/api/hostel/${encodeURIComponent(hostel)}/average-rating`
-      );
-      if (!response.ok) {
-        const text = await response.text();
-        console.error(`Failed to fetch average rating for ${hostel}: ${text}`);
-        return { hostel, rating: 0 };
-      }
-      const data = await response.json();
-      return { hostel, rating: data.averageRating || 0 };
-    });
-
-    const results = await Promise.all(requests);
-    const avgRatings = results.reduce((acc, { hostel, rating }) => {
-      acc[hostel] = rating;
-      return acc;
-    }, {});
-    setAverageRatings(avgRatings);
-  } catch (error) {
-    console.error('Failed to fetch average ratings:', error);
-  }
-}, []);
-
-    const fetchUserRatings = useCallback(async () => {
+  const getUserIdFromToken = () => {
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      console.error('No token found');
+      return null;
+    }
     try {
-      const userId = getUserIdFromToken();
-      if (!userId) return;
-
-      const ratings = {};
-
-    for (const hostel of [
-      'Hostel A', 'Hostel B', 'Hostel C', 'Hostel D', 'Hostel E',
-      'Hostel F', 'Hostel FR-F', 'Hostel FR-G', 'Hostel G', 'Hostel H',
-      'Hostel I', 'Hostel J', 'Hostel K', 'Hostel L', 'Hostel M',
-      'Hostel N', 'Hostel O', 'Hostel PG', 'Hostel Q'
-    ]) {
-      const response = await fetch(`https://hostel-hunt-1.onrender.com/api/hostel/${encodeURIComponent(hostel)}/user-rating/${userId}`);
-      if (!response.ok) {
-        const text = await response.text();
-        console.error(`Failed to fetch user rating for ${hostel}: ${text}`);
-        continue;
+      const decodedToken = jwtDecode(token);
+      const expiry = decodedToken.exp * 1000;
+      if (Date.now() > expiry) {
+        console.error('Token has expired');
+        localStorage.removeItem('authToken');
+        return null;
       }
-
-        const data = await response.json();
-        ratings[hostel] = data.rating || 0;
-      }
-
-      setUserRatings(ratings);
+      return decodedToken.userId;
     } catch (error) {
-      console.error('Failed to fetch user ratings:', error);
+      console.error('Failed to decode token:', error);
+      return null;
+    }
+  };
+  const fetchAverageRatings = useCallback(async () => {
+    setIsLoadingRatings(true);
+    try {
+      const requests = HOSTELS.map(async (hostel) => {
+        const response = await fetch(
+          `https://hostel-hunt-1.onrender.com/api/hostel/${encodeURIComponent(hostel)}/average-rating`
+        );
+        if (!response.ok) {
+          const text = await response.text();
+          console.error(`Failed to fetch average rating for ${hostel}: ${text}`);
+          return { hostel, rating: 0 };
+        }
+        const data = await response.json();
+        return { hostel, rating: data.averageRating || 0 };
+      });
+
+      const results = await Promise.all(requests);
+      const avgRatings = results.reduce((acc, { hostel, rating }) => {
+        acc[hostel] = rating;
+        return acc;
+      }, {});
+      setAverageRatings(avgRatings);
+    } catch (error) {
+      console.error('Failed to fetch average ratings:', error);
+    } finally {
+      setIsLoadingRatings(false);
     }
   }, []);
 
-   
-    useEffect(() => {
+  const fetchUserRatings = useCallback(async () => {
+    const userId = getUserIdFromToken();
+    if (!userId) return;
+    setIsLoadingUserRatings(true);
+    try {
+      const requests = HOSTELS.map(async (hostel) => {
+        const response = await fetch(
+          `https://hostel-hunt-1.onrender.com/api/hostel/${encodeURIComponent(hostel)}/user-rating/${userId}`
+        );
+        if (!response.ok) {
+          const text = await response.text();
+          console.error(`Failed to fetch user rating for ${hostel}: ${text}`);
+          return { hostel, rating: 0 };
+        }
+        const data = await response.json();
+        return { hostel, rating: data.rating || 0 };
+      });
+
+      const results = await Promise.all(requests);
+      const ratings = results.reduce((acc, { hostel, rating }) => {
+        acc[hostel] = rating;
+        return acc;
+      }, {});
+      setUserRatings(ratings);
+    } catch (error) {
+      console.error('Failed to fetch user ratings:', error);
+    } finally {
+      setIsLoadingUserRatings(false);
+    }
+  }, []);
+
+  useEffect(() => {
     fetchAverageRatings();
     fetchUserRatings();
   }, [fetchAverageRatings, fetchUserRatings]);
 
-   const handleExpandClick = (index) => {
+  const handleExpandClick = (index) => {
     setExpandedIndex(expandedIndex === index ? -1 : index);
   };
-
 
   const handleStarClick = (hostel, rating) => {
     setSelectedRatings((prevRatings) => ({
@@ -96,43 +119,17 @@ export default  function Hostel() {
     }));
   };
 
-  const getUserIdFromToken = () => {
-    const token = localStorage.getItem('authToken');
-    if (!token) {
-      console.error('No token found');
-      return null;
-    }
-
-    try {
-      const decodedToken = jwtDecode(token);
-      const expiry = decodedToken.exp * 1000;
-      const now = Date.now();
-
-      if (now > expiry) {
-        console.error('Token has expired');
-        localStorage.removeItem('authToken');
-        return null;
-      }
-     
-      return decodedToken.userId;
-    } catch (error) {
-      console.error('Failed to decode token:', error);
-      return null;
-    }
-  };
-
-  const handleRateSubmit = async (hostel) => { 
+  const handleRateSubmit = async (hostel) => {
     const rating = selectedRatings[hostel];
     if (!rating) return;
 
+    const userId = getUserIdFromToken();
+    if (!userId) {
+      console.error('Failed to get user ID from token');
+      return;
+    }
+
     try {
-      const userId = getUserIdFromToken();
-
-      if (!userId) {
-        console.error('Failed to get user ID from token');
-        return;
-      }
-
       const response = await fetch('https://hostel-hunt-1.onrender.com/api/rate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -152,45 +149,42 @@ export default  function Hostel() {
   };
 
   const handleSearch = async (hostel) => {
-  const roomNumber = searchedRooms[hostel]?.trim();
+    const roomNumber = searchedRooms[hostel]?.trim();
 
-  if (!roomNumber) {
-    setRoomDetails((prevDetails) => ({
-      ...prevDetails,
-      [hostel]: null,
-    }));
-    return;
-  }
-
-  try {
-    const response = await fetch('https://hostel-hunt-1.onrender.com/api/rooms', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ hostel, roomNumber }),
-    });
-
-    if (!response.ok) {
-      console.error('Failed to search room:', response.statusText);
+    if (!roomNumber) {
+      setRoomDetails((prevDetails) => ({
+        ...prevDetails,
+        [hostel]: null,
+      }));
       return;
     }
 
-    const roomData = await response.json();
-    if (roomData.comments && Array.isArray(roomData.comments)) {
-      roomData.comments.reverse();
+    try {
+      const response = await fetch('https://hostel-hunt-1.onrender.com/api/rooms', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ hostel, roomNumber }),
+      });
+
+      if (!response.ok) {
+        console.error('Failed to search room:', response.statusText);
+        return;
+      }
+
+      const roomData = await response.json();
+      if (roomData.comments && Array.isArray(roomData.comments)) {
+        roomData.comments.reverse();
+      }
+      setRoomDetails((prevDetails) => ({
+        ...prevDetails,
+        [hostel]: roomData,
+      }));
+    } catch (error) {
+      console.error('Failed to search room:', error);
     }
-    setRoomDetails((prevDetails) => ({
-      ...prevDetails,
-      [hostel]: roomData,
-    }));
-  } catch (error) {
-    console.error('Failed to search room:', error);
-  }
-};
+  };
 
-const renderExtraContent = (hostel) => {
-  
-
-  return (
+  const renderExtraContent = (hostel) => (
     <div
       style={{
         backgroundColor: 'rgba(52, 58, 64, 0.8)',
@@ -211,7 +205,9 @@ const renderExtraContent = (hostel) => {
               {index < (selectedRatings[hostel] || userRatings[hostel] || 0) ? '\u2605' : '\u2606'}
             </span>
           ))}
-          <button className="btn btn-secondary ms-2" onClick={() => handleRateSubmit(hostel)}>Rate</button>
+          <button className="btn btn-secondary ms-2" onClick={() => handleRateSubmit(hostel)}>
+            Rate
+          </button>
         </div>
         <div className="d-flex align-items-center">
           <input
@@ -223,28 +219,23 @@ const renderExtraContent = (hostel) => {
             value={searchedRooms[hostel] || ''}
             onChange={(e) => {
               const newRoomNumber = e.target.value;
-              setSearchedRooms({ ...searchedRooms, [hostel]: newRoomNumber });
-
-              
+              setSearchedRooms((prev) => ({ ...prev, [hostel]: newRoomNumber }));
               if (!newRoomNumber.trim()) {
-                setRoomDetails((prevDetails) => ({
-                  ...prevDetails,
-                  [hostel]: null,
-                }));
+                setRoomDetails((prevDetails) => ({ ...prevDetails, [hostel]: null }));
               }
             }}
           />
           <button
             className="btn btn-outline-success"
             onClick={() => handleSearch(hostel)}
-            disabled={!searchedRooms[hostel]?.trim()} 
+            disabled={!searchedRooms[hostel]?.trim()}
           >
             Search
           </button>
         </div>
       </div>
       <div>
-        {roomDetails[hostel] && roomDetails[hostel] !== null && (
+        {roomDetails[hostel] && (
           <RoomDetails
             roomDetails={roomDetails[hostel]}
             commentText={commentText}
@@ -258,10 +249,6 @@ const renderExtraContent = (hostel) => {
       </div>
     </div>
   );
-};
-
-
-
 
   const renderRatingStars = (averageRating) => {
     const fullStars = Math.floor(averageRating);
@@ -269,56 +256,46 @@ const renderExtraContent = (hostel) => {
 
     return (
       <>
-  {[...Array(fullStars)].map((_, index) => (
-    <span key={index} className="text-warning">
-      {'\u2605'} 
-    </span>
-  ))}
-
-  {halfStar && (
-    <span style={{ position: 'relative', display: 'inline-block', width: '1em' }}>
-      <span
-        style={{
-          position: 'absolute',
-          overflow: 'hidden',
-          width: '40%',
-          top: 0,
-          left: 0,
-          color: '#FFD700',
-        }}
-      >
-        {'\u2605'}
-      </span>
-      <span className="text-warning">
-        {'\u2606'}
-      </span>
-    </span>
-  )}
-
-  {[...Array(5 - fullStars - (halfStar ? 1 : 0))].map((_, index) => (
-    <span key={index} className="text-warning">
-      {'\u2606'}
-    </span>
-  ))}
-</>
-
+        {[...Array(fullStars)].map((_, index) => (
+          <span key={index} className="text-warning">
+            {'\u2605'}
+          </span>
+        ))}
+        {halfStar && (
+          <span style={{ position: 'relative', display: 'inline-block', width: '1em' }}>
+            <span
+              style={{
+                position: 'absolute',
+                overflow: 'hidden',
+                width: '40%',
+                top: 0,
+                left: 0,
+                color: '#FFD700',
+              }}
+            >
+              {'\u2605'}
+            </span>
+            <span className="text-warning">{'\u2606'}</span>
+          </span>
+        )}
+        {[...Array(5 - fullStars - (halfStar ? 1 : 0))].map((_, index) => (
+          <span key={index} className="text-warning">
+            {'\u2606'}
+          </span>
+        ))}
+      </>
     );
   };
 
   return (
     <div style={{ width: '80%', margin: '0 auto' }}>
-      {[
-        'Hostel A', 'Hostel B', 'Hostel C', 'Hostel D', 'Hostel E',
-        'Hostel F', 'Hostel FR-F', 'Hostel FR-G', 'Hostel G', 'Hostel H',
-        'Hostel I', 'Hostel J', 'Hostel K', 'Hostel L', 'Hostel M',
-        'Hostel N', 'Hostel O', 'Hostel PG', 'Hostel Q'
-      ].map((hostel, index) => (
+      {HOSTELS.map((hostel, index) => (
         <div
           key={index}
           className="s"
           data-bs-theme="dark"
           style={{
-            backgroundColor: 'rgba(33, 37, 41, 0.8) ',
+            backgroundColor: 'rgba(33, 37, 41, 0.8)',
             padding: '16px',
             border: expandedIndex === index ? 'none' : '1px solid white',
             borderBottom: expandedIndex === index ? 'none' : '1px solid white',
