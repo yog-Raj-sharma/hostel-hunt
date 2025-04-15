@@ -48,34 +48,47 @@ export default function Hostel() {
 }, []); 
 
   const fetchAverageRatings = async () => {
-    try {
-      const hostels = [
-        'Wrapchick', 'Sips & Bite', 'Dessert Club', 'Bombay Munchurry', 'Pizza Nation', 
-    'Chai Nagari', 'Kabir Store', 'Stationary', "Men's Salon", "Women's Salon",
-    'Airtel', 'NesCafe', 'Aahar(Uncle)', 'Aahar(Auntty)', 'Old Aahar', 
-    'G-block Cafeteria', "Jaggi's Coffee Shop", "Jaggi's Juice Shop", 'Hostel H Canteen'
-      ];
+  try {
+    const hostels = [
+      'Wrapchick', 'Sips & Bite', 'Dessert Club', 'Bombay Munchurry', 'Pizza Nation', 
+      'Chai Nagari', 'Kabir Store', 'Stationary', "Men's Salon", "Women's Salon",
+      'Airtel', 'NesCafe', 'Aahar(Uncle)', 'Aahar(Auntty)', 'Old Aahar', 
+      'G-block Cafeteria', "Jaggi's Coffee Shop", "Jaggi's Juice Shop", 'Hostel H Canteen'
+    ];
 
-      const avgRatings = {};
-
-      for (const hostel of hostels) {
-        const response = await fetch(`https://hostel-hunt-1.onrender.com/api/hostel/${encodeURIComponent(hostel)}/average-rating`);
-
+    // Create an array of promises, one for each fetch request.
+    const requests = hostels.map(async (hostel) => {
+      try {
+        const response = await fetch(
+          `https://hostel-hunt-1.onrender.com/api/hostel/${encodeURIComponent(hostel)}/average-rating`
+        );
         if (!response.ok) {
           const text = await response.text();
           console.error(`Failed to fetch average rating for ${hostel}: ${text}`);
-          continue; 
+          return { hostel, rating: 0 };
         }
-
         const data = await response.json();
-        avgRatings[hostel] = data.averageRating || 0;
+        return { hostel, rating: data.averageRating || 0 };
+      } catch (error) {
+        console.error(`Error fetching rating for ${hostel}:`, error);
+        return { hostel, rating: 0 };
       }
+    });
 
-      setAverageRatings(avgRatings);
-    } catch (error) {
-      console.error('Failed to fetch average ratings:', error);
-    }
-  };
+    const results = await Promise.all(requests);
+
+    const avgRatings = results.reduce((acc, { hostel, rating }) => {
+      acc[hostel] = rating;
+      return acc;
+    }, {});
+
+    setAverageRatings(avgRatings);
+  } catch (error) {
+    console.error('Failed to fetch average ratings:', error);
+  }
+};
+
+
 
    const handleExpandClick = (index) => {
     setExpandedIndex(expandedIndex === index ? -1 : index);
