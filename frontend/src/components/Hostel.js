@@ -16,34 +16,37 @@ export default  function Hostel() {
   const [userRatings, setUserRatings] = useState({});
 
     const fetchAverageRatings = useCallback(async () => {
-    try {
-      const hostels = [
-        'Hostel A', 'Hostel B', 'Hostel C', 'Hostel D', 'Hostel E',
-        'Hostel F', 'Hostel FR-F', 'Hostel FR-G', 'Hostel G', 'Hostel H',
-        'Hostel I', 'Hostel J', 'Hostel K', 'Hostel L', 'Hostel M',
-        'Hostel N', 'Hostel O', 'Hostel PG', 'Hostel Q'
-      ];
+  try {
+    const hostels = [
+      'Hostel A', 'Hostel B', 'Hostel C', 'Hostel D', 'Hostel E',
+      'Hostel F', 'Hostel FR-F', 'Hostel FR-G', 'Hostel G', 'Hostel H',
+      'Hostel I', 'Hostel J', 'Hostel K', 'Hostel L', 'Hostel M',
+      'Hostel N', 'Hostel O', 'Hostel PG', 'Hostel Q'
+    ];
 
-      const avgRatings = {};
-
-      for (const hostel of hostels) {
-        const response = await fetch(`https://hostel-hunt-1.onrender.com/api/hostel/${encodeURIComponent(hostel)}/average-rating`);
-
-        if (!response.ok) {
-          const text = await response.text();
-          console.error(`Failed to fetch average rating for ${hostel}: ${text}`);
-          continue;
-        }
-
-        const data = await response.json();
-        avgRatings[hostel] = data.averageRating || 0;
+    const requests = hostels.map(async (hostel) => {
+      const response = await fetch(
+        `https://hostel-hunt-1.onrender.com/api/hostel/${encodeURIComponent(hostel)}/average-rating`
+      );
+      if (!response.ok) {
+        const text = await response.text();
+        console.error(`Failed to fetch average rating for ${hostel}: ${text}`);
+        return { hostel, rating: 0 };
       }
+      const data = await response.json();
+      return { hostel, rating: data.averageRating || 0 };
+    });
 
-      setAverageRatings(avgRatings);
-    } catch (error) {
-      console.error('Failed to fetch average ratings:', error);
-    }
-  }, []);
+    const results = await Promise.all(requests);
+    const avgRatings = results.reduce((acc, { hostel, rating }) => {
+      acc[hostel] = rating;
+      return acc;
+    }, {});
+    setAverageRatings(avgRatings);
+  } catch (error) {
+    console.error('Failed to fetch average ratings:', error);
+  }
+}, []);
 
     const fetchUserRatings = useCallback(async () => {
     try {
