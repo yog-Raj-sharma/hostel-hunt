@@ -16,6 +16,9 @@ export default function Outlets() {
   const [expandedIndex, setExpandedIndex] = useState(-1);
   const [selectedRatings, setSelectedRatings] = useState({});
   const [showFoodItems, setShowFoodItems] = useState({});
+  const [isLoadingRatings, setIsLoadingRatings] = useState(false);
+  const [isLoadingUserRatings, setIsLoadingUserRatings] = useState(false);
+  
   
   const { outletsState, setOutletsState } = useContext(PageStateContext);
   
@@ -58,6 +61,7 @@ export default function Outlets() {
   };
 
   const fetchAverageRatings = useCallback(async () => {
+    setIsLoadingRatings(true);
     try {
       const requests = OUTLETS.map(async (outlet) => {
         try {
@@ -84,12 +88,15 @@ export default function Outlets() {
       setAverageRatings(newAvgRatings);
     } catch (error) {
       console.error('Failed to fetch average ratings:', error);
+    } finally {
+      setIsLoadingRatings(false);
     }
   }, []);
 
   const fetchUserRatings = useCallback(async () => {
     const userId = getUserIdFromToken();
     if (!userId) return;
+    setIsLoadingUserRatings(true);
     try {
       const requests = OUTLETS.map(async (outlet) => {
         try {
@@ -116,6 +123,8 @@ export default function Outlets() {
       setUserRatings(newUserRatings);
     } catch (error) {
       console.error('Failed to fetch user ratings:', error);
+    } finally {
+      setIsLoadingUserRatings(false);
     }
   }, []);
 
