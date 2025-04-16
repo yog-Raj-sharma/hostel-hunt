@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
-import jwtDecode from 'jwt-decode';
+import {jwtDecode} from 'jwt-decode'; 
+
 import FoodItems from './FoodItems';
 
 const HOSTELS = [
