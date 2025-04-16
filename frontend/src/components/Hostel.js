@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect, useCallback } from 'react';
 import PageStateContext from '../contexts/PageStateContext';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
-import { default as jwtDecode } from 'jwt-decode';
+import jwtDecode from 'jwt-decode';
 import RoomDetails from './RoomDetails';
 
 const HOSTELS = [
@@ -15,30 +15,23 @@ const HOSTELS = [
 export default function Hostel() {
   const [expandedIndex, setExpandedIndex] = useState(-1);
   const [selectedRatings, setSelectedRatings] = useState({});
+  const [averageRatings, setAverageRatings] = useState({});
   const [roomDetails, setRoomDetails] = useState({});
   const [commentText, setCommentText] = useState('');
   const [selectedImages, setSelectedImages] = useState([]);
   const [searchedRooms, setSearchedRooms] = useState({});
+  const [userRatings, setUserRatings] = useState({});
+  const { hostelState, setHostelState } = useContext(PageStateContext);
   const [isLoadingRatings, setIsLoadingRatings] = useState(false);
   const [isLoadingUserRatings, setIsLoadingUserRatings] = useState(false);
 
-  const { hostelState, setHostelState } = useContext(PageStateContext);
+   const [localData, setLocalData] = useState(hostelState || {
+    ratings: {},
+  });
 
-  const [averageRatings, setAverageRatings] = useState(hostelState.averageRatings || {});
-  const [userRatings, setUserRatings] = useState(hostelState.userRatings || {});
-  useEffect(() => {
-    setHostelState(prev => ({
-      ...prev,
-      averageRatings: averageRatings,
-    }));
-  }, [averageRatings, setHostelState]);
-
-  useEffect(() => {
-    setHostelState(prev => ({
-      ...prev,
-      userRatings: userRatings,
-    }));
-  }, [userRatings, setHostelState]);
+   useEffect(() => {
+    setHostelState(localData);
+  }, [localData, setHostelState]);
 
   const getUserIdFromToken = () => {
     const token = localStorage.getItem('authToken');
@@ -60,7 +53,6 @@ export default function Hostel() {
       return null;
     }
   };
-
   const fetchAverageRatings = useCallback(async () => {
     setIsLoadingRatings(true);
     try {
@@ -76,12 +68,13 @@ export default function Hostel() {
         const data = await response.json();
         return { hostel, rating: data.averageRating || 0 };
       });
+
       const results = await Promise.all(requests);
-      const newAvgRatings = results.reduce((acc, { hostel, rating }) => {
+      const avgRatings = results.reduce((acc, { hostel, rating }) => {
         acc[hostel] = rating;
         return acc;
       }, {});
-      setAverageRatings(newAvgRatings);
+      setAverageRatings(avgRatings);
     } catch (error) {
       console.error('Failed to fetch average ratings:', error);
     } finally {
@@ -106,12 +99,13 @@ export default function Hostel() {
         const data = await response.json();
         return { hostel, rating: data.rating || 0 };
       });
+
       const results = await Promise.all(requests);
-      const newUserRatings = results.reduce((acc, { hostel, rating }) => {
+      const ratings = results.reduce((acc, { hostel, rating }) => {
         acc[hostel] = rating;
         return acc;
       }, {});
-      setUserRatings(newUserRatings);
+      setUserRatings(ratings);
     } catch (error) {
       console.error('Failed to fetch user ratings:', error);
     } finally {
@@ -151,11 +145,13 @@ export default function Hostel() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ hostel, user: userId, rating }),
       });
+
       if (!response.ok) {
         const text = await response.text();
         console.error('Failed to submit rating:', text);
         return;
       }
+
       await fetchAverageRatings();
     } catch (error) {
       console.error('Failed to submit rating:', error);
@@ -179,10 +175,12 @@ export default function Hostel() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ hostel, roomNumber }),
       });
+
       if (!response.ok) {
         console.error('Failed to search room:', response.statusText);
         return;
       }
+
       const roomData = await response.json();
       if (roomData.comments && Array.isArray(roomData.comments)) {
         roomData.comments.reverse();
