@@ -162,32 +162,6 @@ export default function Outlets() {
     }
   };
 
-  const handleSearch = async (outlet) => {
-    const roomNumber = searchedRooms[outlet]?.trim();
-    if (!roomNumber) {
-      setRoomDetails(prevDetails => ({ ...prevDetails, [outlet]: null }));
-      return;
-    }
-    try {
-      const response = await fetch('https://hostel-hunt-1.onrender.com/api/rooms', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ outlet, roomNumber }),
-      });
-      if (!response.ok) {
-        console.error('Failed to search room:', response.statusText);
-        return;
-      }
-      const roomData = await response.json();
-      if (roomData.comments && Array.isArray(roomData.comments)) {
-        roomData.comments.reverse();
-      }
-      setRoomDetails(prevDetails => ({ ...prevDetails, [outlet]: roomData }));
-    } catch (error) {
-      console.error('Failed to search room:', error);
-    }
-  };
-
   const renderExtraContent = (outlet) => (
     <div
       style={{
