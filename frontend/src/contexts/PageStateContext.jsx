@@ -3,9 +3,9 @@ import React, { createContext, useState } from 'react';
 const PageStateContext = createContext();
 
 export const PageStateProvider = ({ children }) => {
-  const [hostelState, setHostelState] = useState({averageRatings: {}, userRatings: {}});
-  const [outletsState, setOutletsState] = useState({ averageRatings: {}, userRatings: {},});
-  const [sellState, setSellState] = useState({  items: [], newItem: { name: '', image: null, price: '', contact: '' },});
+  const [hostelState, setHostelState] = useState({ averageRatings: {}, userRatings: {} });
+  const [outletsState, setOutletsState] = useState({ averageRatings: {}, userRatings: {} });
+  const [sellState, setSellState] = useState({ items: [], newItem: { name: '', image: null, price: '', contact: '' } });
 
   const value = {
     hostelState,
@@ -17,7 +17,7 @@ export const PageStateProvider = ({ children }) => {
   };
 
   return (
-    <PageStateContext.Provider value={{ hostelState, setHostelState, outletsState, setOutletsState, sellState, setSellState }}>
+    <PageStateContext.Provider value={value}>
       {children}
     </PageStateContext.Provider>
   );
