@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect, useCallback } from 'react';
 import PageStateContext from '../contexts/PageStateContext';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
-import jwtDecode from 'jwt-decode';
+import { default as jwtDecode } from 'jwt-decode';
 import RoomDetails from './RoomDetails';
 
 const HOSTELS = [
