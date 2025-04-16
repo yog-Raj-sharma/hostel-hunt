@@ -6,13 +6,15 @@ const User = require('../models/User');
 const router = express.Router();
 require('dotenv').config(); 
 
+const sendotp = process.env.nodemailer_password;
+
 const otps = {};
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
         user: 'yraj_be21@thapar.edu', 
-        pass: 'sdpe eymq xtea chpt',  
+        pass: sendotp,  
     },
 });
 
