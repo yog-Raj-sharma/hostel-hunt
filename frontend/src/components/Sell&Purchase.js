@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useContext } from 'react';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import PageStateContext from '../contexts/PageStateContext';
 
 const API_BASE_URL = 'https://hostel-hunt-1.onrender.com';
 
@@ -14,11 +15,22 @@ const parseToken = (token) => {
 };
 
 export default function Sell() {
-  const [items, setItems] = useState([]);
-  const [newItem, setNewItem] = useState({ name: '', image: null, price: '', contact: '' });
+  const { sellState, setSellState } = useContext(PageStateContext);
+  const [items, setItems] = useState(sellState.items || []);
+  const [newItem, setNewItem] = useState(
+    sellState.newItem || { name: '', image: null, price: '', contact: '' }
+  );
   const [showForm, setShowForm] = useState(false);
   const [showImage, setShowImage] = useState(false);
   const [imageSrc, setImageSrc] = useState('');
+
+  useEffect(() => {
+    setSellState((prev) => ({
+      ...prev,
+      items: items,
+      newItem: newItem,
+    }));
+  }, [items, newItem, setSellState]);
 
   const fetchItems = useCallback(async () => {
     try {
@@ -30,12 +42,15 @@ export default function Sell() {
   }, []);
 
   useEffect(() => {
-    fetchItems();
-  }, [fetchItems]);
+    if (!items || items.length === 0) {
+      fetchItems();
+    }
+  }, [fetchItems, items]);
 
   const handleAddItemClick = useCallback(() => {
     setShowForm(true);
   }, []);
+
   const handleInputChange = useCallback((e) => {
     const { name, value } = e.target;
     setNewItem((prev) => ({ ...prev, [name]: value }));
@@ -70,6 +85,7 @@ export default function Sell() {
       console.error('Failed to save item:', error);
     }
   }, [newItem, fetchItems]);
+
   const handleImageClick = useCallback((src) => {
     setImageSrc(src);
     setShowImage(true);
@@ -212,7 +228,14 @@ export default function Sell() {
       {showImage && (
         <div
           className="modal show"
-          style={{ display: 'block', position: 'absolute', top: '10%', left: '10%', width: '80%', height: '80%' }}
+          style={{
+            display: 'block',
+            position: 'absolute',
+            top: '10%',
+            left: '10%',
+            width: '80%',
+            height: '80%',
+          }}
         >
           <div className="modal-dialog modal-dialog-centered modal-lg">
             <div className="modal-content">

@@ -1,10 +1,9 @@
 import React, { useContext, useState, useEffect, useCallback } from 'react';
-import PageStateContext from '../contexts/PageStateContext';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
 import {jwtDecode} from 'jwt-decode'; 
-
 import RoomDetails from './RoomDetails';
+import PageStateContext from '../contexts/PageStateContext';
 
 const HOSTELS = [
   'Hostel A', 'Hostel B', 'Hostel C', 'Hostel D', 'Hostel E',
