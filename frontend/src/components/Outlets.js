@@ -8,7 +8,7 @@ import FoodItems from './FoodItems';
 const OUTLETS = [
   'Wrapchick', 'Sips & Bite', 'Dessert Club', 'Bombay Munchurry', 'Pizza Nation', 
   'Chai Nagari', 'Kabir Store', 'Stationary', "Men's Salon", "Women's Salon",
-  'Airtel', 'NesCafe', 'Aahar(Uncle)', 'Aahar(Auntty)', 'Old Aahar', 
+  'Airtel', 'NesCafe', 'Aahar(Uncle)', 'Aahar(Aunty)', 'Old Aahar', 
   'G-block Cafeteria', "Jaggi's Coffee Shop", "Jaggi's Juice Shop", 'Hostel H Canteen'
 ];
 
@@ -16,10 +16,7 @@ export default function Outlets() {
   const [expandedIndex, setExpandedIndex] = useState(-1);
   const [selectedRatings, setSelectedRatings] = useState({});
   const [showFoodItems, setShowFoodItems] = useState({});
-  const [roomDetails, setRoomDetails] = useState({});
-  const [commentText, setCommentText] = useState('');
-  const [selectedImages, setSelectedImages] = useState([]);
-  const [searchedRooms, setSearchedRooms] = useS
+  
   const { outletsState, setOutletsState } = useContext(PageStateContext);
   
   const [averageRatings, setAverageRatings] = useState(outletsState.averageRatings || {});
