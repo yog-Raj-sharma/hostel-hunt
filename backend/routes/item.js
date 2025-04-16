@@ -14,7 +14,6 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-// POST /api/items
 router.post('/', upload.single('image'), async (req, res) => {
   const { name, price, contact, userId } = req.body;
   const image = req.file.path;
@@ -28,7 +27,6 @@ router.post('/', upload.single('image'), async (req, res) => {
   }
 });
 
-// GET /api/items
 router.get('/', async (req, res) => {
   try {
     const items = await Item.find();

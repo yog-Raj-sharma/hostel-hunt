@@ -62,7 +62,7 @@ export default function Outlets() {
       const requests = OUTLETS.map(async (outlet) => {
         try {
           const response = await fetch(
-            `https://hostel-hunt-1.onrender.com/api/outlet/${encodeURIComponent(outlet)}/average-rating`
+            `https://hostel-hunt-1.onrender.com/api/hostel/${encodeURIComponent(outlet)}/average-rating`
           );
           if (!response.ok) {
             const text = await response.text();
@@ -94,7 +94,7 @@ export default function Outlets() {
       const requests = OUTLETS.map(async (outlet) => {
         try {
           const response = await fetch(
-            `https://hostel-hunt-1.onrender.com/api/outlet/${encodeURIComponent(outlet)}/user-rating/${userId}`
+            `https://hostel-hunt-1.onrender.com/api/hostel/${encodeURIComponent(outlet)}/user-rating/${userId}`
           );
           if (!response.ok) {
             const text = await response.text();
