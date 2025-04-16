@@ -16,9 +16,6 @@ export default function Outlets() {
   const [expandedIndex, setExpandedIndex] = useState(-1);
   const [selectedRatings, setSelectedRatings] = useState({});
   const [showFoodItems, setShowFoodItems] = useState({});
-  const [isLoadingRatings, setIsLoadingRatings] = useState(false);
-  const [isLoadingUserRatings, setIsLoadingUserRatings] = useState(false);
-  
   
   const { outletsState, setOutletsState } = useContext(PageStateContext);
   
@@ -61,7 +58,6 @@ export default function Outlets() {
   };
 
   const fetchAverageRatings = useCallback(async () => {
-    setIsLoadingRatings(true);
     try {
       const requests = OUTLETS.map(async (outlet) => {
         try {
@@ -88,15 +84,12 @@ export default function Outlets() {
       setAverageRatings(newAvgRatings);
     } catch (error) {
       console.error('Failed to fetch average ratings:', error);
-    } finally {
-      setIsLoadingRatings(false);
     }
   }, []);
 
   const fetchUserRatings = useCallback(async () => {
     const userId = getUserIdFromToken();
     if (!userId) return;
-    setIsLoadingUserRatings(true);
     try {
       const requests = OUTLETS.map(async (outlet) => {
         try {
@@ -123,8 +116,6 @@ export default function Outlets() {
       setUserRatings(newUserRatings);
     } catch (error) {
       console.error('Failed to fetch user ratings:', error);
-    } finally {
-      setIsLoadingUserRatings(false);
     }
   }, []);
 
@@ -158,7 +149,7 @@ export default function Outlets() {
       const response = await fetch('https://hostel-hunt-1.onrender.com/api/rate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ outlet, user: userId, rating }),
+        body: JSON.stringify({ hostel:outlet, user: userId, rating }),
       });
       if (!response.ok) {
         const text = await response.text();
@@ -166,6 +157,7 @@ export default function Outlets() {
         return;
       }
       await fetchAverageRatings();
+      await fetchUserRatings();
     } catch (error) {
       console.error('Failed to submit rating:', error);
     }
@@ -179,7 +171,7 @@ export default function Outlets() {
         borderTop: 'none',
         borderBottom: '2px solid white',
       }}
-    >
+     >
       <div className="d-flex justify-content-between align-items-center">
         <div className="d-flex align-items-center">
           {[...Array(5)].map((_, idx) => (

@@ -74,6 +74,7 @@ export default function FoodItems({ outlet }) {
           maxHeight: '320px',
           overflowY: 'auto',
           width: '200px',
+          color: '#000', 
         }}
       >
         {foodItems.length > 0 ? (
