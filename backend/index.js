@@ -20,7 +20,7 @@ app.use(cors({
       return callback(new Error(msg), false);
     }
     return callback(null, true);
-  }
+  },credentials: true
 }));
 
 app.use(express.json());
