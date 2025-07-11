@@ -12,17 +12,22 @@ const app = express();
 
 const allowedOrigins = ['https://hostel-hunt-4.onrender.com', 'http://localhost:3000'];
 
-app.use(cors({
+const corsOptions = {
   origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin) || origin === 'null') {
+    if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
     }
   },
-  credentials: true
-}));
+  credentials: true,
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  optionsSuccessStatus: 204
+};
 
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); // <== handles preflight
 
 app.use(express.json());
 

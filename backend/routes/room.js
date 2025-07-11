@@ -1,13 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const Room = require('../models/room');
-const multer = require('multer');
-const path = require('path');
 const User = require('../models/User');
-const upload = multer({
-  dest: 'uploads/', 
-  limits: { fileSize: 5 * 1024 * 1024 } 
-});
+
 
 router.post('/', async (req, res) => {
   try {
@@ -66,11 +61,10 @@ router.get('/api/rooms/:hostel/:roomNumber', async (req, res) => {
   }
 });
 
-router.post('/:hostel/:roomNumber/comments', upload.array('images'), async (req, res) => {
+router.post('/:hostel/:roomNumber/comments', async (req, res) => {
   try {
     const { hostel, roomNumber } = req.params;
-    const { text, userId } = req.body;
-    const images = req.files.map(file => file.path);
+    const { text, userId, images } = req.body; 
 
     const room = await Room.findOneAndUpdate(
       { hostel, roomNumber },
@@ -79,9 +73,10 @@ router.post('/:hostel/:roomNumber/comments', upload.array('images'), async (req,
           comments: {
             userId,
             text,
-            images
-          }
-        }
+            images,
+            timestamp: new Date()
+          },
+        },
       },
       { new: true }
     );
@@ -92,6 +87,7 @@ router.post('/:hostel/:roomNumber/comments', upload.array('images'), async (req,
 
     res.status(200).json(room);
   } catch (error) {
+    console.error('Error posting comment:', error);
     res.status(500).json({ error: 'Failed to post comment' });
   }
 });

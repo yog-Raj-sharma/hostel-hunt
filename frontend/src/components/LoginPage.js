@@ -5,13 +5,13 @@ import axios from 'axios';
 
 export default function LoginPage() {
     const navigate = useNavigate();
-    const [email, setEmail] = useState();
-    const [password, setPassword] = useState();
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
 
     const handleSignIn = async (e) => { 
       e.preventDefault();
         try {
-            const response = await axios.post('https://hostel-hunt-1.onrender.com/api/auth/signin', { email, password });
+            const response = await axios.post('https://hostel-hunt-1.onrender.com/api/auth/signin', { email, password }, { withCredentials: true } );
             const { token } = response.data;
 
             if (token) {
