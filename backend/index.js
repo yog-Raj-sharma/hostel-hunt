@@ -14,14 +14,15 @@ const allowedOrigins = ['https://hostel-hunt-4.onrender.com', 'http://localhost:
 
 app.use(cors({
   origin: function (origin, callback) {
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) === -1) {
-      const msg = 'The CORS policy for this site does not allow access from the specified origin.';
-      return callback(new Error(msg), false);
+    if (!origin || allowedOrigins.includes(origin) || origin === 'null') {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
     }
-    return callback(null, true);
-  },credentials: true
+  },
+  credentials: true
 }));
+
 
 app.use(express.json());
 
