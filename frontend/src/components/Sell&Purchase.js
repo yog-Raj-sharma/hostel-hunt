@@ -2,6 +2,24 @@ import React, { useState, useEffect, useCallback, useContext } from 'react';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import PageStateContext from '../contexts/PageStateContext';
+import imageCompression from 'browser-image-compression';
+import { initializeApp } from 'firebase/app';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { v4 as uuidv4 } from 'uuid';
+
+
+const firebaseConfig = {
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.REACT_APP_FIREBASE_APP_ID,
+};
+
+const app = initializeApp(firebaseConfig);
+const storage = getStorage(app);
+
 
 const API_BASE_URL = 'https://hostel-hunt-1.onrender.com';
 
@@ -61,30 +79,46 @@ export default function Sell() {
     setNewItem((prev) => ({ ...prev, image: file }));
   }, []);
 
-  const handleSubmit = useCallback(async () => {
-    const formData = new FormData();
-    formData.append('name', newItem.name);
-    formData.append('price', newItem.price);
-    formData.append('contact', newItem.contact);
-    formData.append('image', newItem.image);
+const compressAndUploadImage = async (file) => {
+  const compressed = await imageCompression(file, {
+    maxSizeMB: 0.5,
+    maxWidthOrHeight: 1024,
+    useWebWorker: true,
+  });
 
-    const token = localStorage.getItem('authToken');
-    const parsedToken = parseToken(token);
-    const userId = parsedToken ? parsedToken.userId : null;
-    if (!userId) return;
-    formData.append('userId', userId);
+  const storageRef = ref(storage, `items/${uuidv4()}-${compressed.name}`);
+  await uploadBytes(storageRef, compressed);
+  const downloadURL = await getDownloadURL(storageRef);
+  return downloadURL;
+};
 
-    try {
-      await axios.post(`${API_BASE_URL}/api/items`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-      setNewItem({ name: '', image: null, price: '', contact: '' });
-      setShowForm(false);
-      fetchItems();
-    } catch (error) {
-      console.error('Failed to save item:', error);
-    }
-  }, [newItem, fetchItems]);
+
+ const handleSubmit = useCallback(async () => {
+  const token = localStorage.getItem('authToken');
+  const parsedToken = parseToken(token);
+  const userId = parsedToken ? parsedToken.userId : null;
+  if (!userId) return;
+
+  try {
+    const imageUrl = await compressAndUploadImage(newItem.image); 
+
+    const payload = {
+      name: newItem.name,
+      price: newItem.price,
+      contact: newItem.contact,
+      image: imageUrl,      
+      userId: userId
+    };
+
+    await axios.post(`${API_BASE_URL}/api/items`, payload);
+    setNewItem({ name: '', image: null, price: '', contact: '' });
+    setShowForm(false);
+    fetchItems();
+  } catch (error) {
+    console.error('Failed to save item:', error);
+  }
+}, [newItem, fetchItems]);
+
 
   const handleImageClick = useCallback((src) => {
     setImageSrc(src);

@@ -164,38 +164,59 @@ export default function Hostel() {
   };
 
   const handleSearch = async (hostel) => {
-    const roomNumber = searchedRooms[hostel]?.trim();
+  const rawInput = searchedRooms[hostel]?.trim();
 
-    if (!roomNumber) {
-      setRoomDetails((prevDetails) => ({
-        ...prevDetails,
-        [hostel]: null,
-      }));
+  if (!rawInput) {
+    setRoomDetails((prevDetails) => ({
+      ...prevDetails,
+      [hostel]: null,
+    }));
+    return;
+  }
+
+  // Normalize input: remove extra spaces, capitalize letters
+  let formattedRoomNumber = rawInput;
+  const match = rawInput.match(/^([a-zA-Z\s]*)(\d+)$/);
+
+  if (match) {
+    const letters = match[1].replace(/\s+/g, '').toUpperCase(); // Remove spaces & uppercase
+    const digits = match[2];
+    formattedRoomNumber = letters ? `${letters} ${digits}` : digits;
+  }
+
+  // ✅ Now use the formattedRoomNumber
+  setSearchedRooms((prev) => ({
+    ...prev,
+    [hostel]: formattedRoomNumber,
+  }));
+
+  try {
+    const response = await fetch('https://hostel-hunt-1.onrender.com/api/rooms', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ hostel, roomNumber: formattedRoomNumber }),
+    });
+
+    if (!response.ok) {
+      console.error('Failed to search room:', response.statusText);
       return;
     }
 
-    try {
-      const response = await fetch('https://hostel-hunt-1.onrender.com/api/rooms', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ hostel, roomNumber }),
-      });
-      if (!response.ok) {
-        console.error('Failed to search room:', response.statusText);
-        return;
-      }
-      const roomData = await response.json();
-      if (roomData.comments && Array.isArray(roomData.comments)) {
-        roomData.comments.reverse();
-      }
-      setRoomDetails((prevDetails) => ({
-        ...prevDetails,
-        [hostel]: roomData,
-      }));
-    } catch (error) {
-      console.error('Failed to search room:', error);
+    const roomData = await response.json();
+
+    if (roomData.comments && Array.isArray(roomData.comments)) {
+      roomData.comments.reverse();
     }
-  };
+
+    setRoomDetails((prevDetails) => ({
+      ...prevDetails,
+      [hostel]: roomData,
+    }));
+  } catch (error) {
+    console.error('Failed to search room:', error);
+  }
+};
+
 
   const renderExtraContent = (hostel) => (
     <div
@@ -234,8 +255,9 @@ export default function Hostel() {
               const newRoomNumber = e.target.value;
               setSearchedRooms((prev) => ({ ...prev, [hostel]: newRoomNumber }));
               if (!newRoomNumber.trim()) {
-                setRoomDetails((prevDetails) => ({ ...prevDetails, [hostel]: null }));
-              }
+                 setSearchedRooms((prev) => ({ ...prev, [hostel]: '' }));
+                      }
+
             }}
           />
           <button
