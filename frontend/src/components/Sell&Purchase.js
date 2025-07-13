@@ -230,12 +230,12 @@ const compressAndUploadImage = async (file) => {
             </span>
             <div style={{ flexBasis: '10%', display: 'flex', justifyContent: 'center' }}>
               <img
-                src={`${API_BASE_URL}/${item.image}`}
-                alt={item.name}
-                style={{ width: '50px', height: '50px', borderRadius: '4px', cursor: 'pointer' }}
-                onClick={() => handleImageClick(`${API_BASE_URL}/${item.image}`)}
-                loading="lazy"
-              />
+                  src={item.image}
+                  alt={item.name}
+                  style={{ width: '50px', height: '50px', borderRadius: '4px', cursor: 'pointer' }}
+                  onClick={() => handleImageClick(item.image)}
+                  loading="lazy"
+                  />
             </div>
             <span
               className="text-white"
