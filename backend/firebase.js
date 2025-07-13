@@ -1,12 +1,10 @@
-// utils/firebase.js
 const admin = require('firebase-admin');
-const serviceAccount = require('../firebase-key.json');
+const serviceAccount = require('../path/to/your/firebase-service-account.json'); 
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  storageBucket: 'hostel-hunt-image-container.appspot.com'  // from Firebase Console
+  storageBucket: process.env.FIREBASE_STORAGE_BUCKET, 
 });
 
 const bucket = admin.storage().bucket();
-
 module.exports = bucket;
