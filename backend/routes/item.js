@@ -1,7 +1,6 @@
 const express = require('express');
 const Item = require('../models/Item');
 const router = express.Router();
-const bucket = require('../firebase'); 
 const admin = require('../firebaseAdmin'); 
 const { getStorage } = require('firebase-admin/storage');
 router.post('/', async (req, res) => {
